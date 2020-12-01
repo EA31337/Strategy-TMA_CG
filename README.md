@@ -1,3 +1,3 @@
-# Strategy TMA True
+# Strategy TMA CG
 
-Strategy based on Triangular Moving Average (TMA) indicator.
+Strategy based on TMA+CG mladen NRP indicator.
