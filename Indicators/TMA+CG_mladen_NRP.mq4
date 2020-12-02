@@ -129,8 +129,9 @@ int start() {
     return (0);
   }
   if (TimeFrame > Period())
-    limit = MathMax(limit, MathMin(Bars - 1, iCustom(NULL, TimeFrame, IndicatorFileName, "returnBars", 0, 0) *
-                                                 TimeFrame / Period()));
+    limit = MathMax(limit,
+                    MathMin(Bars - 1, iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, 0, 0, false, true) *
+                                          TimeFrame / Period()));
 
   //
   //
@@ -148,12 +149,12 @@ int start() {
     //
     //
 
-    tmBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, "calculateTma", HalfLength, AppliedPrice, BandsDeviations,
-                          0, shift1);
-    upBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, "calculateTma", HalfLength, AppliedPrice, BandsDeviations,
-                          1, shift1);
-    dnBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, "calculateTma", HalfLength, AppliedPrice, BandsDeviations,
-                          2, shift1);
+    tmBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, HalfLength, AppliedPrice, BandsDeviations,
+                          true, false, 0, shift1);
+    upBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, HalfLength, AppliedPrice, BandsDeviations,
+                          true, false, 1, shift1);
+    dnBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, HalfLength, AppliedPrice, BandsDeviations,
+                          true, false, 2, shift1);
 
     upArrow[i] = EMPTY_VALUE;
     dnArrow[i] = EMPTY_VALUE;
