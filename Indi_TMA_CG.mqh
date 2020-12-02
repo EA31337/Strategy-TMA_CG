@@ -21,12 +21,14 @@
 
 // User input params.
 INPUT string __TMA_CG_Indi_Params__ = "-- TMA CG indicator params --";  // >>> TMA CG indicator <<<
-INPUT int Indi_TMA_CG_Timeframe = 0;                                    // Timeframe
-INPUT int Indi_TMA_CG_HalfLength = 3;                                   // Half length
-INPUT double Indi_TMA_CG_AtrMultiplier = 0.5;                           // ATR multiplier
-INPUT int Indi_TMA_CG_AtrPeriod = 6;                                    // ATR period
-INPUT int Indi_TMA_CG_BarsToProcess = 0;                                // Bars to process
-INPUT int Indi_TMA_CG_Shift = 0;                                        // Indicator Shift
+INPUT int Indi_TMA_CG_HalfLength = 61;                                  // Half length
+INPUT ENUM_APPLIED_PRICE Indi_TMA_CG_AppliedPrice = PRICE_WEIGHTED;     // Applied price
+INPUT double Indi_TMA_CG_AtrPeriod = 6;                                 // ATR period
+INPUT double Indi_TMA_CG_BandsDeviations = 2.8;                         // Bands Deviations
+INPUT ENUM_MA_METHOD Indi_TMA_CG_MM = MODE_SMA;                         // MA Method.
+INPUT int Indi_TMA_CG_Shift = 0;  // Indicator Shift
+
+extern int HalfLength = 61;
 
 // Includes.
 #include <EA31337-classes/Indicator.mqh>
@@ -58,7 +60,7 @@ struct Indi_TMA_CG_Params : public IndicatorParams {
         atr_period(_atr_period),
         bars_to_process(_bars_to_process) {
     max_modes = FINAL_TMA_CG_MODE_ENTRY;
-    custom_indi_name = "Indi_TMA_CG";
+    custom_indi_name = "TMA+CG_mladen_NRP";
     SetDataSourceType(IDATA_ICUSTOM);
     SetDataValueType(TYPE_DOUBLE);
   };

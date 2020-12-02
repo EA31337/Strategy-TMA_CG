@@ -27,17 +27,19 @@
 //
 
 // External variables.
-extern ENUM_TIMEFRAMES TimeFrame = PERIOD_CURRENT;
-extern int HalfLength = 61;
-extern ENUM_APPLIED_PRICE AppliedPrice = PRICE_WEIGHTED;
-extern double BandsDeviations = 2.8;
 extern bool CalculateTma = false;
 extern bool ReturnBars = false;
+extern int HalfLength = 61;
+extern int AtrPeriod = 20;
+extern double BandsDeviations = 2.8;
+extern ENUM_APPLIED_PRICE MaAppliedPrice = PRICE_WEIGHTED;
+extern ENUM_MA_METHOD MaMethod = MODE_SMA;
+extern int MaPeriod = 1;
+extern int SignalDuration = 3;
 extern bool Interpolate = true;
 extern bool AlertsOn = false;
 extern bool AlertsOnCurrent = false;
 extern bool AlertsOnHighLow = false;
-extern int SignalDuration = 3;
 
 // Internal variables.
 bool alertsEmail = false;
@@ -128,10 +130,10 @@ int start() {
     calculateTma(limit);
     return (0);
   }
-  if (TimeFrame > Period())
-    limit = MathMax(limit,
-                    MathMin(Bars - 1, iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, 0, 0, false, true) *
-                                          TimeFrame / Period()));
+
+  // @fixme: Is this needed?
+  // double _bar_limit = iCustom(_Symbol, PERIOD_CURRENT, IndicatorFileName, false, true);
+  // limit = MathMax(limit, MathMin(Bars - 1, _bar_limit * PERIOD_CURRENT / Period()));
 
   //
   //
@@ -140,8 +142,8 @@ int start() {
   //
   if (limit < Bars - 20) limit = 1;
   for (i = limit; i >= 0; i--) {
-    int shift1 = iBarShift(NULL, TimeFrame, Time[i]);
-    datetime time1 = iTime(NULL, TimeFrame, shift1);
+    int shift1 = iBarShift(_Symbol, PERIOD_CURRENT, Time[i]);
+    datetime time1 = iTime(_Symbol, PERIOD_CURRENT, shift1);
 
     //
     //
@@ -149,26 +151,25 @@ int start() {
     //
     //
 
-    tmBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, HalfLength, AppliedPrice, BandsDeviations,
-                          true, false, 0, shift1);
-    upBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, HalfLength, AppliedPrice, BandsDeviations,
-                          true, false, 1, shift1);
-    dnBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, PERIOD_CURRENT, HalfLength, AppliedPrice, BandsDeviations,
-                          true, false, 2, shift1);
-
+    tmBuffer[i] = iCustom(_Symbol, PERIOD_CURRENT, IndicatorFileName, true, false, HalfLength, AtrPeriod,
+                          BandsDeviations, MaAppliedPrice, MaMethod, MaPeriod, SignalDuration, Interpolate, 0, shift1);
+    upBuffer[i] = iCustom(_Symbol, PERIOD_CURRENT, IndicatorFileName, true, false, HalfLength, AtrPeriod,
+                          BandsDeviations, MaAppliedPrice, MaMethod, MaPeriod, SignalDuration, Interpolate, 1, shift1);
+    dnBuffer[i] = iCustom(_Symbol, PERIOD_CURRENT, IndicatorFileName, true, false, HalfLength, AtrPeriod,
+                          BandsDeviations, MaAppliedPrice, MaMethod, MaPeriod, SignalDuration, Interpolate, 2, shift1);
     upArrow[i] = EMPTY_VALUE;
     dnArrow[i] = EMPTY_VALUE;
     if (High[i + 1] > upBuffer[i + 1] && Close[i + 1] > Open[i + 1] && Close[i] < Open[i]) {
-      upArrow[i] = High[i] + iATR(NULL, 0, 20, i);
+      upArrow[i] = High[i] + iATR(_Symbol, PERIOD_CURRENT, AtrPeriod, i);
     }
     if (Low[i + 1] < dnBuffer[i + 1] && Close[i + 1] < Open[i + 1] && Close[i] > Open[i]) {
-      dnArrow[i] = High[i] - iATR(NULL, 0, 20, i);
+      dnArrow[i] = High[i] - iATR(_Symbol, PERIOD_CURRENT, AtrPeriod, i);
     }
 
     if (upArrow[i] != EMPTY_VALUE) {
       up_counter++;
     } else if (up_counter > 0 && up_counter < SignalDuration) {
-      upArrow[i] = High[i] + iATR(NULL, 0, 20, i);
+      upArrow[i] = High[i] + iATR(_Symbol, PERIOD_CURRENT, AtrPeriod, i);
       up_counter++;
     } else
       up_counter = 0;
@@ -176,12 +177,12 @@ int start() {
     if (dnArrow[i] != EMPTY_VALUE) {
       down_counter++;
     } else if (down_counter > 0 && down_counter < SignalDuration) {
-      dnArrow[i] = High[i] - iATR(NULL, 0, 20, i);
+      dnArrow[i] = High[i] - iATR(_Symbol, PERIOD_CURRENT, AtrPeriod, i);
       down_counter++;
     } else
       down_counter = 0;
 
-    if (TimeFrame <= Period() || shift1 == iBarShift(NULL, TimeFrame, Time[i - 1])) continue;
+    if (PERIOD_CURRENT <= Period() || shift1 == iBarShift(_Symbol, PERIOD_CURRENT, Time[i - 1])) continue;
     if (!Interpolate) continue;
 
     //
@@ -210,13 +211,13 @@ int start() {
     int forBar = AlertsOnCurrent ? 0 : 1;
     if (AlertsOnHighLow) {
       if (High[forBar] > upBuffer[forBar] && High[forBar + 1] < upBuffer[forBar + 1])
-        doAlert("high penetrated upper bar");
+        doAlert("High penetrated upper bar");
       if (Low[forBar] < dnBuffer[forBar] && Low[forBar + 1] > dnBuffer[forBar + 1]) doAlert("low penetrated lower bar");
     } else {
       if (Close[forBar] > upBuffer[forBar] && Close[forBar + 1] < upBuffer[forBar + 1])
-        doAlert("close penetrated upper bar");
+        doAlert("Close penetrated upper bar");
       if (Close[forBar] < dnBuffer[forBar] && Close[forBar + 1] > dnBuffer[forBar + 1])
-        doAlert("close penetrated lower bar");
+        doAlert("Close penetrated lower bar");
     }
   }
 
@@ -243,14 +244,14 @@ void calculateTma(int limit) {
   //
 
   for (i = limit; i >= 0; i--) {
-    double sum = (HalfLength + 1) * iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i);
+    double sum = (HalfLength + 1) * iMA(_Symbol, PERIOD_CURRENT, MaPeriod, 0, MaMethod, MaAppliedPrice, i);
     double sumw = (HalfLength + 1);
     for (j = 1, k = HalfLength; j <= HalfLength; j++, k--) {
-      sum += k * iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i + j);
+      sum += k * iMA(_Symbol, PERIOD_CURRENT, MaPeriod, 0, MaMethod, MaAppliedPrice, i + j);
       sumw += k;
 
       if (j <= i) {
-        sum += k * iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i - j);
+        sum += k * iMA(_Symbol, PERIOD_CURRENT, MaPeriod, 0, MaMethod, MaAppliedPrice, i - j);
         sumw += k;
       }
     }
@@ -262,7 +263,7 @@ void calculateTma(int limit) {
     //
     //
 
-    double diff = iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i) - tmBuffer[i];
+    double diff = iMA(_Symbol, PERIOD_CURRENT, MaPeriod, 0, MaMethod, MaAppliedPrice, i) - tmBuffer[i];
     if (i > (Bars - HalfLength - 1)) continue;
     if (i == (Bars - HalfLength - 1)) {
       upBuffer[i] = tmBuffer[i];
