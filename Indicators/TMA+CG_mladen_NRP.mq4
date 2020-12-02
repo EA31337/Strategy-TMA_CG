@@ -33,6 +33,7 @@ extern bool Interpolate = true;
 extern bool alertsOn = false;
 extern bool alertsOnCurrent = false;
 extern bool alertsOnHighLow = false;
+extern int signalDuration = 3;
 bool alertsMessage = false;
 bool alertNotification = false;
 bool alertsSound = false;
@@ -63,6 +64,7 @@ string IndicatorFileName;
 bool calculatingTma = false;
 bool returningBars = false;
 int timeFrame;
+int up_counter, down_counter;
 
 //+------------------------------------------------------------------+
 //|                                                                  |
@@ -71,7 +73,7 @@ int timeFrame;
 //
 //
 //
-
+datetime time;
 int init() {
   timeFrame = stringToTimeFrame(TimeFrame);
   HalfLength = MathMax(HalfLength, 1);
@@ -167,6 +169,22 @@ int start() {
     if (Low[i + 1] < dnBuffer[i + 1] && Close[i + 1] < Open[i + 1] && Close[i] > Open[i]) {
       dnArrow[i] = High[i] - iATR(NULL, 0, 20, i);
     }
+
+    if (upArrow[i] != EMPTY_VALUE) {
+      up_counter++;
+    } else if (up_counter > 0 && up_counter < signalDuration) {
+      upArrow[i] = High[i] + iATR(NULL, 0, 20, i);
+      up_counter++;
+    } else
+      up_counter = 0;
+
+    if (dnArrow[i] != EMPTY_VALUE) {
+      down_counter++;
+    } else if (down_counter > 0 && down_counter < signalDuration) {
+      dnArrow[i] = High[i] - iATR(NULL, 0, 20, i);
+      down_counter++;
+    } else
+      down_counter = 0;
 
     if (timeFrame <= Period() || shift1 == iBarShift(NULL, timeFrame, Time[i - 1])) continue;
     if (!Interpolate) continue;
