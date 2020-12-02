@@ -281,13 +281,13 @@ int OnCalculate(const int rates_total, const int prev_calculated, const datetime
   int toSkip = 1;
   for (int pos = MathMin(bars_limit, rates_total - 1 - MathMax(prev_calculated, toSkip)); pos >= 0 && !IsStopped();
        --pos) {
-    double upValue = iCustom(_Symbol, _Period, "TMA+CG mladen NRP", TimeFrame, HalfLength, Price, BandsDeviations,
+    double upValue = iCustom(_Symbol, _Period, "TMA+CG_mladen_NRP", TimeFrame, HalfLength, Price, BandsDeviations,
                              Interpolate, 3, pos);
     int colorIndex = out.GetColorIndex(pos + 1);
     if (upValue != EMPTY_VALUE) {
       colorIndex = 0;
     }
-    double downValue = iCustom(_Symbol, _Period, "TMA+CG mladen NRP", TimeFrame, HalfLength, Price, BandsDeviations,
+    double downValue = iCustom(_Symbol, _Period, "TMA+CG_mladen_NRP", TimeFrame, HalfLength, Price, BandsDeviations,
                                Interpolate, 4, pos);
     if (downValue != EMPTY_VALUE) {
       colorIndex = 1;
