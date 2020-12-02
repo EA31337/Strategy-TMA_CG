@@ -1,5 +1,6 @@
 // More information about this indicator can be found at:
 // http://fxcodebase.com/code/viewtopic.php?f=38&t=70514
+// Modified by kenorb (2020)
 
 //+------------------------------------------------------------------+
 //|                               Copyright © 2020, Gehtsoft USA LLC |

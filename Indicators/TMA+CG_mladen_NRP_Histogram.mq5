@@ -16,11 +16,13 @@
 #include <EA31337-classes/Indicator.mqh>
 #include <EA31337-classes/Indicators/Indi_ATR.mqh>
 #include <EA31337-classes/Indicators/Indi_MA.mqh>
+#include <EA31337-classes/Market.mqh>
 
 // Defines macros.
 #define Bars (Chart::iBars(_Symbol, _Period))
 
 // Custom indicator iteration function.
+/*
 int OnCalculate(const int rates_total, const int prev_calculated, const int begin, const double &price[]) {
   // if (begin > 0) PlotIndexSetInteger(0, PLOT_DRAW_BEGIN, begin + SvePeriod);
   // if (begin > 0) PlotIndexSetInteger(1, PLOT_DRAW_BEGIN, begin + SvePeriod);
@@ -30,6 +32,7 @@ int OnCalculate(const int rates_total, const int prev_calculated, const int begi
   start();
   return (rates_total);
 }
+*/
 
 // Includes the main file.
 #include "TMA+CG_mladen_NRP_Histogram.mq4"

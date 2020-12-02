@@ -18,6 +18,7 @@
 #property indicator_width5 2
 
 // Includes EA31337 framework.
+#include <EA31337-classes/Chart.mqh>
 #include <EA31337-classes/Draw.mqh>
 #include <EA31337-classes/Indicator.mqh>
 #include <EA31337-classes/Indicators/Indi_ATR.mqh>

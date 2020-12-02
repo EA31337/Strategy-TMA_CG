@@ -19,7 +19,7 @@ INPUT float TMA_CG_MaxSpread = 2.0;           // Max spread to trade (in pips)
 
 // Includes.
 #include <EA31337-classes/Strategy.mqh>
-//#include "Indi_TMA_CG.mqh"
+#include "Indi_TMA_CG.mqh"
 
 // Defines struct with default user strategy values.
 struct Stg_TMA_CG_Params_Defaults : StgParams {

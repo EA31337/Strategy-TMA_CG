@@ -2,6 +2,7 @@
 //|                                                       TMA+CG.mq4 |
 //|                                                           mladen |
 //| Arrows coded according to idea presented by rajiv                |
+//| Modified by kenorb (2020)                                        |
 //+------------------------------------------------------------------+
 #property copyright "rajivxxx"
 #property link "rajivxxx@gmail.com"
@@ -25,20 +26,24 @@
 //
 //
 
-extern string TimeFrame = "current time frame";
+// External variables.
+extern ENUM_TIMEFRAMES TimeFrame = PERIOD_CURRENT;
 extern int HalfLength = 61;
-extern int Price = PRICE_WEIGHTED;
+extern ENUM_APPLIED_PRICE AppliedPrice = PRICE_WEIGHTED;
 extern double BandsDeviations = 2.8;
+extern bool CalculateTma = false;
+extern bool ReturnBars = false;
 extern bool Interpolate = true;
-extern bool alertsOn = false;
-extern bool alertsOnCurrent = false;
-extern bool alertsOnHighLow = false;
-extern int signalDuration = 3;
-bool alertsMessage = false;
-bool alertNotification = false;
-bool alertsSound = false;
+extern bool AlertsOn = false;
+extern bool AlertsOnCurrent = false;
+extern bool AlertsOnHighLow = false;
+extern int SignalDuration = 3;
+
+// Internal variables.
 bool alertsEmail = false;
 bool alertsMessage = false;
+bool alertsNotification = false;
+bool alertsSound = false;
 
 //
 //
@@ -61,9 +66,8 @@ double dnArrow[];
 //
 
 string IndicatorFileName;
-bool calculatingTma = false;
 bool returningBars = false;
-int timeFrame;
+int halfLength = HalfLength;
 int up_counter, down_counter;
 
 //+------------------------------------------------------------------+
@@ -75,8 +79,7 @@ int up_counter, down_counter;
 //
 datetime time;
 int init() {
-  timeFrame = stringToTimeFrame(TimeFrame);
-  HalfLength = MathMax(HalfLength, 1);
+  halfLength = MathMax(HalfLength, 1);
   IndicatorBuffers(7);
   SetIndexBuffer(0, tmBuffer);
   SetIndexBuffer(1, upBuffer);
@@ -94,15 +97,6 @@ int init() {
   SetIndexArrow(3, 233);
   SetIndexStyle(4, DRAW_ARROW);
   SetIndexArrow(4, 234);
-
-  if (TimeFrame == "calculateTma") {
-    calculatingTma = true;
-    return (0);
-  }
-  if (TimeFrame == "returnBars") {
-    returningBars = true;
-    return (0);
-  }
 
   IndicatorFileName = WindowExpertName();
   return (0);
@@ -126,17 +120,17 @@ int start() {
   if (counted_bars > 0) counted_bars--;
   limit = MathMin(Bars - 1, Bars - counted_bars + HalfLength);
 
-  if (returningBars) {
+  if (ReturnBars) {
     tmBuffer[0] = limit;
     return (0);
   }
-  if (calculatingTma) {
+  if (CalculateTma) {
     calculateTma(limit);
     return (0);
   }
-  if (timeFrame > Period())
-    limit = MathMax(limit, MathMin(Bars - 1, iCustom(NULL, timeFrame, IndicatorFileName, "returnBars", 0, 0) *
-                                                 timeFrame / Period()));
+  if (TimeFrame > Period())
+    limit = MathMax(limit, MathMin(Bars - 1, iCustom(NULL, TimeFrame, IndicatorFileName, "returnBars", 0, 0) *
+                                                 TimeFrame / Period()));
 
   //
   //
@@ -145,8 +139,8 @@ int start() {
   //
   if (limit < Bars - 20) limit = 1;
   for (i = limit; i >= 0; i--) {
-    int shift1 = iBarShift(NULL, timeFrame, Time[i]);
-    datetime time1 = iTime(NULL, timeFrame, shift1);
+    int shift1 = iBarShift(NULL, TimeFrame, Time[i]);
+    datetime time1 = iTime(NULL, TimeFrame, shift1);
 
     //
     //
@@ -154,12 +148,12 @@ int start() {
     //
     //
 
-    tmBuffer[i] =
-        iCustom(NULL, timeFrame, IndicatorFileName, "calculateTma", HalfLength, Price, BandsDeviations, 0, shift1);
-    upBuffer[i] =
-        iCustom(NULL, timeFrame, IndicatorFileName, "calculateTma", HalfLength, Price, BandsDeviations, 1, shift1);
-    dnBuffer[i] =
-        iCustom(NULL, timeFrame, IndicatorFileName, "calculateTma", HalfLength, Price, BandsDeviations, 2, shift1);
+    tmBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, "calculateTma", HalfLength, AppliedPrice, BandsDeviations,
+                          0, shift1);
+    upBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, "calculateTma", HalfLength, AppliedPrice, BandsDeviations,
+                          1, shift1);
+    dnBuffer[i] = iCustom(NULL, TimeFrame, IndicatorFileName, "calculateTma", HalfLength, AppliedPrice, BandsDeviations,
+                          2, shift1);
 
     upArrow[i] = EMPTY_VALUE;
     dnArrow[i] = EMPTY_VALUE;
@@ -172,7 +166,7 @@ int start() {
 
     if (upArrow[i] != EMPTY_VALUE) {
       up_counter++;
-    } else if (up_counter > 0 && up_counter < signalDuration) {
+    } else if (up_counter > 0 && up_counter < SignalDuration) {
       upArrow[i] = High[i] + iATR(NULL, 0, 20, i);
       up_counter++;
     } else
@@ -180,13 +174,13 @@ int start() {
 
     if (dnArrow[i] != EMPTY_VALUE) {
       down_counter++;
-    } else if (down_counter > 0 && down_counter < signalDuration) {
+    } else if (down_counter > 0 && down_counter < SignalDuration) {
       dnArrow[i] = High[i] - iATR(NULL, 0, 20, i);
       down_counter++;
     } else
       down_counter = 0;
 
-    if (timeFrame <= Period() || shift1 == iBarShift(NULL, timeFrame, Time[i - 1])) continue;
+    if (TimeFrame <= Period() || shift1 == iBarShift(NULL, TimeFrame, Time[i - 1])) continue;
     if (!Interpolate) continue;
 
     //
@@ -195,7 +189,8 @@ int start() {
     //
     //
 
-    for (int n = 1; i + n < Bars && Time[i + n] >= time1; n++) continue;
+    int n = 1;
+    for (n = 1; i + n < Bars && Time[i + n] >= time1; n++) continue;
     double factor = 1.0 / n;
     for (int k = 1; k < n; k++) {
       tmBuffer[i + k] = k * factor * tmBuffer[i + n] + (1.0 - k * factor) * tmBuffer[i];
@@ -210,12 +205,9 @@ int start() {
   //
   //
 
-  if (alertsOn) {
-    if (alertsOnCurrent)
-      int forBar = 0;
-    else
-      forBar = 1;
-    if (alertsOnHighLow) {
+  if (AlertsOn) {
+    int forBar = AlertsOnCurrent ? 0 : 1;
+    if (AlertsOnHighLow) {
       if (High[forBar] > upBuffer[forBar] && High[forBar + 1] < upBuffer[forBar + 1])
         doAlert("high penetrated upper bar");
       if (Low[forBar] < dnBuffer[forBar] && Low[forBar + 1] > dnBuffer[forBar + 1]) doAlert("low penetrated lower bar");
@@ -250,14 +242,14 @@ void calculateTma(int limit) {
   //
 
   for (i = limit; i >= 0; i--) {
-    double sum = (HalfLength + 1) * iMA(NULL, 0, 1, 0, MODE_SMA, Price, i);
+    double sum = (HalfLength + 1) * iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i);
     double sumw = (HalfLength + 1);
     for (j = 1, k = HalfLength; j <= HalfLength; j++, k--) {
-      sum += k * iMA(NULL, 0, 1, 0, MODE_SMA, Price, i + j);
+      sum += k * iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i + j);
       sumw += k;
 
       if (j <= i) {
-        sum += k * iMA(NULL, 0, 1, 0, MODE_SMA, Price, i - j);
+        sum += k * iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i - j);
         sumw += k;
       }
     }
@@ -269,7 +261,7 @@ void calculateTma(int limit) {
     //
     //
 
-    double diff = iMA(NULL, 0, 1, 0, MODE_SMA, Price, i) - tmBuffer[i];
+    double diff = iMA(NULL, 0, 1, 0, MODE_SMA, AppliedPrice, i) - tmBuffer[i];
     if (i > (Bars - HalfLength - 1)) continue;
     if (i == (Bars - HalfLength - 1)) {
       upBuffer[i] = tmBuffer[i];
@@ -326,38 +318,10 @@ void doAlert(string doWhat) {
     previousAlert = doWhat;
     previousTime = Time[0];
 
-    message = StringConcatenate(Symbol(), " at ", TimeToStr(TimeLocal(), TIME_SECONDS), " THA : ", doWhat);
+    message = StringFormat("%s at %s; THA: %s", _Symbol, TimeToStr(TimeLocal(), TIME_SECONDS), doWhat);
+    if (alertsEmail) SendMail(StringFormat("%s %s", _Symbol, "TMA"), message);
     if (alertsMessage) Alert(message);
-    if (alertsEmail) SendMail(StringConcatenate(Symbol(), "TMA "), message);
+    if (alertsNotification) SendNotification(message);
     if (alertsSound) PlaySound("alert2.wav");
-    if (alertNotification) SendNotification(message);
   }
-}
-
-//
-//
-//
-//
-//
-
-int stringToTimeFrame(string tfs) {
-  for (int l = StringLen(tfs) - 1; l >= 0; l--) {
-    int tchar = StringGetChar(tfs, l);
-    if ((tchar > 96 && tchar < 123) || (tchar > 223 && tchar < 256))
-      tfs = StringSetChar(tfs, 1, tchar - 32);
-    else if (tchar > -33 && tchar < 0)
-      tfs = StringSetChar(tfs, 1, tchar + 224);
-  }
-  int tf = 0;
-  if (tfs == "M1" || tfs == "1") tf = PERIOD_M1;
-  if (tfs == "M5" || tfs == "5") tf = PERIOD_M5;
-  if (tfs == "M15" || tfs == "15") tf = PERIOD_M15;
-  if (tfs == "M30" || tfs == "30") tf = PERIOD_M30;
-  if (tfs == "H1" || tfs == "60") tf = PERIOD_H1;
-  if (tfs == "H4" || tfs == "240") tf = PERIOD_H4;
-  if (tfs == "D1" || tfs == "1440") tf = PERIOD_D1;
-  if (tfs == "W1" || tfs == "10080") tf = PERIOD_W1;
-  if (tfs == "MN" || tfs == "43200") tf = PERIOD_MN1;
-  if (tf == 0 || tf < Period()) tf = Period();
-  return (tf);
 }
