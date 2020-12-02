@@ -21,12 +21,12 @@
 
 // User input params.
 INPUT string __TMA_CG_Indi_Params__ = "-- TMA CG indicator params --";  // >>> TMA CG indicator <<<
-INPUT int Indi_TMA_CG_Timeframe = 0;                                      // Timeframe
-INPUT int Indi_TMA_CG_HalfLength = 3;                                     // Half length
-INPUT double Indi_TMA_CG_AtrMultiplier = 0.5;                             // ATR multiplier
-INPUT int Indi_TMA_CG_AtrPeriod = 6;                                      // ATR period
-INPUT int Indi_TMA_CG_BarsToProcess = 0;                                  // Bars to process
-INPUT int Indi_TMA_CG_Shift = 0;                                          // Indicator Shift
+INPUT int Indi_TMA_CG_Timeframe = 0;                                    // Timeframe
+INPUT int Indi_TMA_CG_HalfLength = 3;                                   // Half length
+INPUT double Indi_TMA_CG_AtrMultiplier = 0.5;                           // ATR multiplier
+INPUT int Indi_TMA_CG_AtrPeriod = 6;                                    // ATR period
+INPUT int Indi_TMA_CG_BarsToProcess = 0;                                // Bars to process
+INPUT int Indi_TMA_CG_Shift = 0;                                        // Indicator Shift
 
 // Includes.
 #include <EA31337-classes/Indicator.mqh>
@@ -50,8 +50,8 @@ struct Indi_TMA_CG_Params : public IndicatorParams {
   int atr_period;
   int bars_to_process;
   // Struct constructors.
-  void Indi_TMA_CG_Params(int _atr_tf, int _half_length, double _atr_multiplier, int _atr_period,
-                            int _bars_to_process, int _shift)
+  void Indi_TMA_CG_Params(int _atr_tf, int _half_length, double _atr_multiplier, int _atr_period, int _bars_to_process,
+                          int _shift)
       : atr_tf(_atr_tf),
         half_length(_half_length),
         atr_multiplier(_atr_multiplier),
@@ -84,7 +84,7 @@ struct Indi_TMA_CG_Params : public IndicatorParams {
 struct Indi_TMA_CG_Params_Defaults : Indi_TMA_CG_Params {
   Indi_TMA_CG_Params_Defaults()
       : Indi_TMA_CG_Params(::Indi_TMA_CG_Timeframe, ::Indi_TMA_CG_HalfLength, ::Indi_TMA_CG_AtrMultiplier,
-                             ::Indi_TMA_CG_AtrPeriod, ::Indi_TMA_CG_BarsToProcess, ::Indi_TMA_CG_Shift) {}
+                           ::Indi_TMA_CG_AtrPeriod, ::Indi_TMA_CG_BarsToProcess, ::Indi_TMA_CG_Shift) {}
 } indi_tmacg_defaults;
 
 /**

@@ -19,6 +19,7 @@ INPUT float TMA_CG_MaxSpread = 2.0;           // Max spread to trade (in pips)
 
 // Includes.
 #include <EA31337-classes/Strategy.mqh>
+
 #include "Indi_TMA_CG.mqh"
 
 // Defines struct with default user strategy values.
@@ -26,8 +27,8 @@ struct Stg_TMA_CG_Params_Defaults : StgParams {
   Stg_TMA_CG_Params_Defaults()
       : StgParams(::TMA_CG_SignalOpenMethod, ::TMA_CG_SignalOpenFilterMethod, ::TMA_CG_SignalOpenLevel,
                   ::TMA_CG_SignalOpenBoostMethod, ::TMA_CG_SignalCloseMethod, ::TMA_CG_SignalCloseLevel,
-                  ::TMA_CG_PriceStopMethod, ::TMA_CG_PriceStopLevel, ::TMA_CG_TickFilterMethod,
-                  ::TMA_CG_MaxSpread, ::TMA_CG_Shift) {}
+                  ::TMA_CG_PriceStopMethod, ::TMA_CG_PriceStopLevel, ::TMA_CG_TickFilterMethod, ::TMA_CG_MaxSpread,
+                  ::TMA_CG_Shift) {}
 } stg_tmacg_defaults;
 
 // Defines struct to store indicator and strategy params.
@@ -57,7 +58,7 @@ class Stg_TMA_CG : public Strategy {
     StgParams _stg_params(stg_tmacg_defaults);
     if (!Terminal::IsOptimization()) {
       SetParamsByTf<Indi_TMA_CG_Params>(_indi_params, _tf, indi_tmacg_m1, indi_tmacg_m5, indi_tmacg_m15, indi_tmacg_m30,
-                                          indi_tmacg_h1, indi_tmacg_h4, indi_tmacg_h8);
+                                        indi_tmacg_h1, indi_tmacg_h4, indi_tmacg_h8);
       SetParamsByTf<StgParams>(_stg_params, _tf, stg_tmacg_m1, stg_tmacg_m5, stg_tmacg_m15, stg_tmacg_m30, stg_tmacg_h1,
                                stg_tmacg_h4, stg_tmacg_h8);
     }
@@ -124,12 +125,12 @@ class Stg_TMA_CG : public Strategy {
     double _result = _default_value;
     switch (_method) {
       case 1:
-        _result = (_direction > 0 ? _indi[CURR].value[TMA_CG_UPPER] : _indi[CURR].value[TMA_CG_LOWER]) +
-                  _trail * _direction;
+        _result =
+            (_direction > 0 ? _indi[CURR].value[TMA_CG_UPPER] : _indi[CURR].value[TMA_CG_LOWER]) + _trail * _direction;
         break;
       case 2:
-        _result = (_direction > 0 ? _indi[PREV].value[TMA_CG_UPPER] : _indi[PREV].value[TMA_CG_LOWER]) +
-                  _trail * _direction;
+        _result =
+            (_direction > 0 ? _indi[PREV].value[TMA_CG_UPPER] : _indi[PREV].value[TMA_CG_LOWER]) + _trail * _direction;
         break;
       case 3:
         _result = (_direction > 0 ? _indi[PPREV].value[TMA_CG_UPPER] : _indi[PPREV].value[TMA_CG_LOWER]) +
