@@ -5,14 +5,14 @@
  */
 
 // Defines indicator's parameter values for the given pair symbol and timeframe.
-struct Indi_TMA_True_Params_H8 : Indi_TMA_True_Params {
-  Indi_TMA_True_Params_H8() : Indi_TMA_True_Params(indi_tmat_defaults, PERIOD_H8) { shift = 0; }
-} indi_tmat_h8;
+struct Indi_TMA_CG_Params_H8 : Indi_TMA_CG_Params {
+  Indi_TMA_CG_Params_H8() : Indi_TMA_CG_Params(PERIOD_H8) { shift = 0; }
+} indi_tmacg_h8;
 
 // Defines strategy's parameter values for the given pair symbol and timeframe.
-struct Stg_TMA_True_Params_H8 : StgParams {
+struct Stg_TMA_CG_Params_H8 : StgParams {
   // Struct constructor.
-  Stg_TMA_True_Params_H8() : StgParams(stg_tmat_defaults) {
+  Stg_TMA_CG_Params_H8() : StgParams(stg_tmacg_defaults) {
     lot_size = 0;
     signal_open_method = 0;
     signal_open_filter = 1;
@@ -25,4 +25,4 @@ struct Stg_TMA_True_Params_H8 : StgParams {
     tick_filter_method = 1;
     max_spread = 0;
   }
-} stg_tmat_h8;
+} stg_tmacg_h8;

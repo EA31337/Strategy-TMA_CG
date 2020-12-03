@@ -19,7 +19,7 @@ on:
       - '.git*'
 
 jobs:
-  Compile:
+  Compile-Indicator:
     defaults:
       run:
         shell: powershell
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           path: Include/EA31337-classes
-          ref: master
+          ref: dev
           repository: EA31337/EA31337-classes
       - name: Compile for MQL4
         uses: fx31337/mql-compile-action@master
@@ -37,7 +37,35 @@ jobs:
           include: .
           init-platform: true
           mt-version: 5.0.0.2361
-          path: Indi_TMA_True.mq4
+          path: Indicators/*.mq4
+          verbose: true
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+      - run: Get-Location
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Indicators
+          path: '*.ex?'
+  Compile-Strategy:
+    defaults:
+      run:
+        shell: powershell
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          path: Include/EA31337-classes
+          ref: dev
+          repository: EA31337/EA31337-classes
+      - name: Compile for MQL4
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          init-platform: true
+          mt-version: 5.0.0.2361
+          path: Stg_TMA_CG.mq4
           verbose: true
       - name: Copy Math includes
         run: Copy-Item -Recurse ../MetaTrader/MQL5/Include/Math Include/
@@ -46,7 +74,7 @@ jobs:
         with:
           include: .
           mt-version: 5.0.0.2515
-          path: Indi_TMA_True.mq5
+          path: Stg_TMA_CG.mq5
           verbose: true
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'

@@ -1,25 +1,25 @@
 /**
  * @file
- * Implements TMA True strategy.
+ * Implements TMA CG strategy.
  */
 
 // Includes EA31337 framework.
 #include <EA31337-classes/EA.mqh>
 
 // Inputs.
-input string __TMA_True_Parameters__ = "-- TMA True strategy params --";  // >>> TMA True <<<
+input string __TMA_CG_Parameters__ = "-- TMA CG strategy params --";  // >>> TMA CG <<<
 input int Active_Tfs = 127;               // Activated timeframes (1-255) [M1=1,M5=2,M15=4,M30=8,H1=16,H4=32,H8=64...]
 input ENUM_LOG_LEVEL Log_Level = V_INFO;  // Log level.
 input bool Info_On_Chart = true;          // Display info on chart.
 
 // Includes main strategy class.
-#include "Stg_TMA_True.mqh"
+#include "Stg_TMA_CG.mqh"
 
 // Defines.
-#define ea_name "Strategy TMA_True"
+#define ea_name "Strategy TMA_CG"
 #define ea_version "1.000"
 #define ea_desc "Strategy based on EA31337 framework."
-#define ea_link "https://github.com/EA31337/Strategy-TMA_True"
+#define ea_link "https://github.com/EA31337/Strategy-TMA_CG"
 #define ea_author "kenorb"
 
 // Properties.
@@ -45,7 +45,7 @@ int OnInit() {
   EAParams ea_params(__FILE__, Log_Level);
   ea_params.SetChartInfoFreq(Info_On_Chart ? 2 : 0);
   ea = new EA(ea_params);
-  _result &= ea.StrategyAdd<Stg_TMA_True>(Active_Tfs);
+  _result &= ea.StrategyAdd<Stg_TMA_CG>(Active_Tfs);
   return (_result ? INIT_SUCCEEDED : INIT_FAILED);
 }
 
