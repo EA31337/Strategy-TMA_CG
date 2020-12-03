@@ -6,7 +6,7 @@
 
 // Defines indicator's parameter values for the given pair symbol and timeframe.
 struct Indi_TMA_CG_Params_M30 : Indi_TMA_CG_Params {
-  Indi_TMA_CG_Params_M30() : Indi_TMA_CG_Params(indi_tmacg_defaults, PERIOD_M30) { shift = 0; }
+  Indi_TMA_CG_Params_M30() : Indi_TMA_CG_Params(PERIOD_M30) { shift = 0; }
 } indi_tmacg_m30;
 
 // Defines strategy's parameter values for the given pair symbol and timeframe.

@@ -22,94 +22,80 @@
 // User input params.
 INPUT string __TMA_CG_Indi_Params__ = "-- TMA CG indicator params --";  // >>> TMA CG indicator <<<
 INPUT int Indi_TMA_CG_HalfLength = 61;                                  // Half length
-INPUT ENUM_APPLIED_PRICE Indi_TMA_CG_AppliedPrice = PRICE_WEIGHTED;     // Applied price
-INPUT double Indi_TMA_CG_AtrPeriod = 6;                                 // ATR period
+INPUT int Indi_TMA_CG_AtrPeriod = 6;                                    // ATR period
 INPUT double Indi_TMA_CG_BandsDeviations = 2.8;                         // Bands Deviations
-INPUT ENUM_MA_METHOD Indi_TMA_CG_MM = MODE_SMA;                         // MA Method.
-INPUT int Indi_TMA_CG_Shift = 0;  // Indicator Shift
-
-extern int HalfLength = 61;
+INPUT ENUM_APPLIED_PRICE Indi_TMA_CG_MA_AppliedPrice = PRICE_WEIGHTED;  // Applied price
+INPUT ENUM_MA_METHOD Indi_TMA_CG_MM = MODE_SMA;                         // MA Method
+INPUT int Indi_TMA_CG_Period = 1;                                       // MA Period
+INPUT int Indi_TMA_CG_SignalDuration = 3;                               // Signal duration
+INPUT bool Indi_TMA_CG_Interpolate = true;                              // Interpolate
+INPUT int Indi_TMA_CG_Shift = 0;                                        // Indicator Shift
 
 // Includes.
 #include <EA31337-classes/Indicator.mqh>
 
 // Indicator line identifiers used in the indicator.
 enum ENUM_TMA_CG_MODE {
-  TMA_CG_MAIN = 0,   // Main line.
-  TMA_CG_UPPER = 1,  // Upper limit.
-  TMA_CG_LOWER = 2,  // Lower limit.
+  TMA_CG_TM_BUFF = 0,   // Temp buffer
+  TMA_CG_UP_BUFF = 1,   // Upper buffer
+  TMA_CG_DN_BUFF = 2,   // Down buffer
+  TMA_CG_DN_ARROW = 3,  // Down arrow
+  TMA_CG_UP_ARROW = 4,  // Upper arrow
+  TMA_CG_WU_BUFF = 5,   // Down arrow
+  TMA_CG_WD_BUFF = 6,   // Upper arrow
   FINAL_TMA_CG_MODE_ENTRY,
 };
 
 // Structs.
-
 // Defines struct to store indicator parameter values.
 struct Indi_TMA_CG_Params : public IndicatorParams {
-  // Indicator params.
-  int atr_tf;
-  int half_length;
-  double atr_multiplier;
-  int atr_period;
-  int bars_to_process;
-  // Struct constructors.
-  void Indi_TMA_CG_Params(int _atr_tf, int _half_length, double _atr_multiplier, int _atr_period, int _bars_to_process,
-                          int _shift)
-      : atr_tf(_atr_tf),
-        half_length(_half_length),
-        atr_multiplier(_atr_multiplier),
-        atr_period(_atr_period),
-        bars_to_process(_bars_to_process) {
+  // Constructors.
+  void Indi_TMA_CG_Params(ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
+    SetDefaults();
+    SetDefaults(input_params);
+    SetTf(_tf);
+  }
+  void Indi_TMA_CG_Params(IndiParamEntry &_params[]) {
+    SetDefaults();
+    SetDefaults(input_params);
+    SetInputParams(_params);
+  };
+  // Defaults.
+  void SetDefaults() {
     max_modes = FINAL_TMA_CG_MODE_ENTRY;
     custom_indi_name = "TMA+CG_mladen_NRP";
     SetDataSourceType(IDATA_ICUSTOM);
+    SetDataValueRange(IDATA_RANGE_MIXED);
     SetDataValueType(TYPE_DOUBLE);
-  };
-  void Indi_TMA_CG_Params(Indi_TMA_CG_Params &_params, ENUM_TIMEFRAMES _tf) {
-    this = _params;
-    _params.tf = _tf;
   }
-  // Getters.
-  int GetATRTimeframe() { return atr_tf; }
-  int GetHalfLength() { return half_length; }
-  double GetAtrMultiplier() { return atr_multiplier; }
-  int GetAtrPeriod() { return atr_period; }
-  int GetBarsToProcess() { return bars_to_process; }
-  // Setters.
-  void SetATRTimeframe(int _value) { atr_tf = _value; }
-  void SetHalfLength(int _value) { half_length = _value; }
-  void SetAtrMultiplier(double _value) { atr_multiplier = _value; }
-  void SetAtrPeriod(int _value) { atr_period = _value; }
-  void SetBarsToProcess(int _value) { bars_to_process = _value; }
+  void SetDefaults(IndiParamEntry &_out[]) {
+    IndiParamEntry _defaults[10];
+    _defaults[0] = false;
+    _defaults[1] = false;
+    _defaults[2] = Indi_TMA_CG_HalfLength;
+    _defaults[3] = Indi_TMA_CG_AtrPeriod;
+    _defaults[4] = Indi_TMA_CG_BandsDeviations;
+    _defaults[5] = Indi_TMA_CG_MA_AppliedPrice;
+    _defaults[6] = Indi_TMA_CG_MM;
+    _defaults[7] = Indi_TMA_CG_Period;
+    _defaults[8] = Indi_TMA_CG_SignalDuration;
+    _defaults[9] = Indi_TMA_CG_Interpolate;
+    SetInputParams(_defaults);
+  }
 };
-
-// Defines struct with default user indicator values.
-struct Indi_TMA_CG_Params_Defaults : Indi_TMA_CG_Params {
-  Indi_TMA_CG_Params_Defaults()
-      : Indi_TMA_CG_Params(::Indi_TMA_CG_Timeframe, ::Indi_TMA_CG_HalfLength, ::Indi_TMA_CG_AtrMultiplier,
-                           ::Indi_TMA_CG_AtrPeriod, ::Indi_TMA_CG_BarsToProcess, ::Indi_TMA_CG_Shift) {}
-} indi_tmacg_defaults;
 
 /**
  * Implements indicator class.
  */
 class Indi_TMA_CG : public Indicator {
- public:
-  // Structs.
+ protected:
   Indi_TMA_CG_Params params;
 
+ public:
   /**
    * Class constructor.
    */
-  Indi_TMA_CG(Indi_TMA_CG_Params &_p)
-      : params(_p.atr_tf, _p.half_length, _p.atr_multiplier, _p.atr_period, _p.bars_to_process, _p.shift),
-        Indicator((IndicatorParams)_p) {
-    params = _p;
-  }
-  Indi_TMA_CG(Indi_TMA_CG_Params &_p, ENUM_TIMEFRAMES _tf)
-      : params(_p.atr_tf, _p.half_length, _p.atr_multiplier, _p.atr_period, _p.bars_to_process, _p.shift),
-        Indicator(NULL, _tf) {
-    params = _p;
-  }
+  Indi_TMA_CG(Indi_TMA_CG_Params &_p) : Indicator((IndicatorParams)_p) { params = _p; }
 
   /**
    * Gets indicator's params.
@@ -125,9 +111,12 @@ class Indi_TMA_CG : public Indicator {
     double _value = EMPTY_VALUE;
     switch (params.idstype) {
       case IDATA_ICUSTOM:
-        _value =
-            iCustom(istate.handle, GetSymbol(), GetTf(), params.custom_indi_name, params.tf, params.GetHalfLength(),
-                    params.GetAtrMultiplier(), params.GetAtrPeriod(), params.GetBarsToProcess(), _mode, _shift);
+        _value = iCustom(istate.handle, GetSymbol(), GetTf(), params.custom_indi_name, params.tf,
+                         params.input_params[0].integer_value, params.input_params[1].integer_value,
+                         params.input_params[2].integer_value, params.input_params[3].integer_value,
+                         params.input_params[4].double_value, params.input_params[5].integer_value,
+                         params.input_params[6].integer_value, params.input_params[7].integer_value,
+                         params.input_params[8].integer_value, params.input_params[9].integer_value, _mode, _shift);
         break;
       default:
         SetUserError(ERR_USER_NOT_SUPPORTED);
@@ -152,9 +141,7 @@ class Indi_TMA_CG : public Indicator {
       for (ENUM_TMA_CG_MODE _mode = 0; _mode < FINAL_TMA_CG_MODE_ENTRY; _mode++) {
         _entry.value.SetValue(params.idvtype, GetValue(_mode, _shift), _mode);
       }
-      _entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, _entry.value.GetMinDbl(params.idvtype) > 0 &&
-                                                   _entry.value.GetValueDbl(params.idvtype, TMA_CG_LOWER) <
-                                                       _entry.value.GetValueDbl(params.idvtype, TMA_CG_UPPER));
+      _entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, _entry.value.GetMinDbl(params.idvtype) > 0);
       if (_entry.IsValid()) {
         idata.Add(_entry, _bar_time);
       }
