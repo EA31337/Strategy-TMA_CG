@@ -139,9 +139,9 @@ class Indi_TMA_CG : public Indicator {
     } else {
       _entry.timestamp = GetBarTime(_shift);
       for (ENUM_TMA_CG_MODE _mode = 0; _mode < FINAL_TMA_CG_MODE_ENTRY; _mode++) {
-        _entry.value.SetValue(params.idvtype, GetValue(_mode, _shift), _mode);
+        _entry.values[_mode] = GetValue(_mode, _shift);
       }
-      _entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, _entry.value.GetMinDbl(params.idvtype) > 0);
+      _entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, _entry.IsGt<double>(0));
       if (_entry.IsValid()) {
         idata.Add(_entry, _bar_time);
       }

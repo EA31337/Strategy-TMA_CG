@@ -115,20 +115,20 @@ class Stg_TMA_CG : public Strategy {
     double _result = _default_value;
     switch (_method) {
       case 1:
-        _result = (_direction > 0 ? _indi[CURR].value[TMA_CG_UP_BUFF] : _indi[CURR].value[TMA_CG_DN_BUFF]) +
+        _result = (_direction > 0 ? _indi[CURR][TMA_CG_UP_BUFF] : _indi[CURR][TMA_CG_DN_BUFF]) +
                   _trail * _direction;
         break;
       case 2:
-        _result = (_direction > 0 ? _indi[PREV].value[TMA_CG_UP_BUFF] : _indi[PREV].value[TMA_CG_DN_BUFF]) +
+        _result = (_direction > 0 ? _indi[PREV][TMA_CG_UP_BUFF] : _indi[PREV][TMA_CG_DN_BUFF]) +
                   _trail * _direction;
         break;
       case 3:
-        _result = (_direction > 0 ? _indi[PPREV].value[TMA_CG_UP_BUFF] : _indi[PPREV].value[TMA_CG_DN_BUFF]) +
+        _result = (_direction > 0 ? _indi[PPREV][TMA_CG_UP_BUFF] : _indi[PPREV][TMA_CG_DN_BUFF]) +
                   _trail * _direction;
         break;
       case 4:
-        _result = (_direction > 0 ? fmax(_indi[PREV].value[TMA_CG_UP_BUFF], _indi[PPREV].value[TMA_CG_UP_BUFF])
-                                  : fmin(_indi[PREV].value[TMA_CG_DN_BUFF], _indi[PPREV].value[TMA_CG_DN_BUFF])) +
+        _result = (_direction > 0 ? fmax(_indi[PREV][TMA_CG_UP_BUFF], _indi[PPREV][TMA_CG_UP_BUFF])
+                                  : fmin(_indi[PREV][TMA_CG_DN_BUFF], _indi[PPREV][TMA_CG_DN_BUFF])) +
                   _trail * _direction;
         break;
     }
