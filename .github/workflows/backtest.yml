@@ -19,7 +19,48 @@ on:
       - '.git*'
 
 jobs:
-  Compile-EA:
+  Compile-Indicators:
+    defaults:
+      run:
+        shell: powershell
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        file:
+          - TMA+CG_mladen_NRP
+          - TMA+CG_mladen_NRP_Histogram
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          path: Include/EA31337-classes
+          ref: dev
+          repository: EA31337/EA31337-classes
+      - name: Compile required indicator for MQL4
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          init-platform: true
+          mt-version: 5.0.0.2361
+          path: Indicators/${{ matrix.file }}.mq4
+          verbose: true
+      - name: Compile required indicator for MQL5
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          init-platform: true
+          mt-version: 5.0.0.2515
+          path: Indicators/${{ matrix.file }}.mq5
+          verbose: true
+      - name: List compiled files
+        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
+      - run: Get-Location
+      - name: Upload indicator artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: Indicators
+          path: 'Indicators/*.ex?'
+  Compile-Strategy:
     defaults:
       run:
         shell: powershell
@@ -56,44 +97,8 @@ jobs:
         with:
           name: EA
           path: '*.ex?'
-  Compile-Indicators:
-    defaults:
-      run:
-        shell: powershell
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
-        with:
-          path: Include/EA31337-classes
-          ref: dev
-          repository: EA31337/EA31337-classes
-      - name: Compile required indicator for MQL4
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: .
-          init-platform: true
-          mt-version: 5.0.0.2361
-          path: Indicators/TMA+CG_mladen_NRP.mq4
-          verbose: true
-      - name: Compile required indicator for MQL5
-        uses: fx31337/mql-compile-action@master
-        with:
-          include: .
-          init-platform: true
-          mt-version: 5.0.0.2515
-          path: Indicators/TMA+CG_mladen_NRP.mq5
-          verbose: true
-      - name: List compiled files
-        run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
-      - run: Get-Location
-      - name: Upload indicator artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: Indicators
-          path: 'Indicators/*.ex?'
   Test:
-    needs: [Compile-EA, Compile-Indicators]
+    needs: [Compile-Strategy, Compile-Indicators]
     runs-on: ubuntu-latest
     strategy:
       matrix:

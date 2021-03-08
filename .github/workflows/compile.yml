@@ -24,6 +24,11 @@ jobs:
       run:
         shell: powershell
     runs-on: windows-latest
+    strategy:
+      matrix:
+        file:
+          - TMA+CG_mladen_NRP
+          - TMA+CG_mladen_NRP_Histogram
     steps:
       - uses: actions/checkout@v2
       - uses: actions/checkout@v2
@@ -37,7 +42,7 @@ jobs:
           include: .
           init-platform: true
           mt-version: 5.0.0.2361
-          path: Indicators/TMA+CG_mladen_NRP.mq4
+          path: Indicators/${{ matrix.file }}.mq4
           verbose: true
       - name: Compile required indicator for MQL5
         uses: fx31337/mql-compile-action@master
@@ -45,7 +50,7 @@ jobs:
           include: .
           init-platform: true
           mt-version: 5.0.0.2515
-          path: Indicators/TMA+CG_mladen_NRP.mq5
+          path: Indicators/${{ matrix.file }}.mq5
           verbose: true
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
