@@ -31,13 +31,21 @@ jobs:
           path: Include/EA31337-classes
           ref: dev
           repository: EA31337/EA31337-classes
-      - name: Compile for MQL4
+      - name: Compile required indicator for MQL4
         uses: fx31337/mql-compile-action@master
         with:
           include: .
           init-platform: true
           mt-version: 5.0.0.2361
-          path: Indicators/*.mq4
+          path: Indicators/TMA+CG_mladen_NRP.mq4
+          verbose: true
+      - name: Compile required indicator for MQL5
+        uses: fx31337/mql-compile-action@master
+        with:
+          include: .
+          init-platform: true
+          mt-version: 5.0.0.2515
+          path: Indicators/TMA+CG_mladen_NRP.mq5
           verbose: true
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
