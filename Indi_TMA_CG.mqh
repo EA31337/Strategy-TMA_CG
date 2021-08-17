@@ -19,21 +19,6 @@
  *
  */
 
-// User input params.
-INPUT string __TMA_CG_Indi_Params__ = "-- TMA CG indicator params --";  // >>> TMA CG indicator <<<
-INPUT int Indi_TMA_CG_HalfLength = 61;                                  // Half length
-INPUT int Indi_TMA_CG_AtrPeriod = 6;                                    // ATR period
-INPUT double Indi_TMA_CG_BandsDeviations = 2.8;                         // Bands Deviations
-INPUT ENUM_APPLIED_PRICE Indi_TMA_CG_MA_AppliedPrice = PRICE_WEIGHTED;  // Applied price
-INPUT ENUM_MA_METHOD Indi_TMA_CG_MM = MODE_SMA;                         // MA Method
-INPUT int Indi_TMA_CG_Period = 1;                                       // MA Period
-INPUT int Indi_TMA_CG_SignalDuration = 3;                               // Signal duration
-INPUT bool Indi_TMA_CG_Interpolate = true;                              // Interpolate
-INPUT int Indi_TMA_CG_Shift = 0;                                        // Indicator Shift
-
-// Includes.
-#include <EA31337-classes/Indicator.mqh>
-
 // Indicator line identifiers used in the indicator.
 enum ENUM_TMA_CG_MODE {
   TMA_CG_TM_BUFF = 0,   // Temp buffer
@@ -50,16 +35,20 @@ enum ENUM_TMA_CG_MODE {
 // Defines struct to store indicator parameter values.
 struct Indi_TMA_CG_Params : public IndicatorParams {
   // Constructors.
+  /*
   void Indi_TMA_CG_Params(ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
     SetDefaults();
     SetDefaults(input_params);
     SetTf(_tf);
   }
+  */
+  /*
   void Indi_TMA_CG_Params(IndiParamEntry &_params[]) {
     SetDefaults();
     SetDefaults(input_params);
     SetInputParams(_params);
   };
+  */
   // Defaults.
   void SetDefaults() {
     max_modes = FINAL_TMA_CG_MODE_ENTRY;
@@ -68,6 +57,7 @@ struct Indi_TMA_CG_Params : public IndicatorParams {
     SetDataValueRange(IDATA_RANGE_MIXED);
     SetDataValueType(TYPE_DOUBLE);
   }
+  /*
   void SetDefaults(IndiParamEntry &_out[]) {
     IndiParamEntry _defaults[10];
     _defaults[0] = false;
@@ -82,6 +72,7 @@ struct Indi_TMA_CG_Params : public IndicatorParams {
     _defaults[9] = Indi_TMA_CG_Interpolate;
     SetInputParams(_defaults);
   }
+  */
 };
 
 /**
@@ -111,7 +102,7 @@ class Indi_TMA_CG : public Indicator {
     double _value = EMPTY_VALUE;
     switch (params.idstype) {
       case IDATA_ICUSTOM:
-        _value = iCustom(istate.handle, GetSymbol(), GetTf(), params.custom_indi_name, params.tf,
+        _value = iCustom(istate.handle, Get<string>(CHART_PARAM_SYMBOL), Get<ENUM_TIMEFRAMES>(CHART_PARAM_TF), params.custom_indi_name, params.tf,
                          params.input_params[0].integer_value, params.input_params[1].integer_value,
                          params.input_params[2].integer_value, params.input_params[3].integer_value,
                          params.input_params[4].double_value, params.input_params[5].integer_value,

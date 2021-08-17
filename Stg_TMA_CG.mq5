@@ -8,7 +8,7 @@
 
 // Inputs.
 input string __TMA_CG_Parameters__ = "-- TMA CG strategy params --";  // >>> TMA CG <<<
-input int Active_Tfs = 127;               // Activated timeframes (1-255) [M1=1,M5=2,M15=4,M30=8,H1=16,H4=32,H8=64...]
+input int Active_Tfs = 28;                // Activated timeframes (1-255) [M1=1,M5=2,M15=4,M30=8,H1=16,H4=32,H8=64...]
 input ENUM_LOG_LEVEL Log_Level = V_INFO;  // Log level.
 input bool Info_On_Chart = true;          // Display info on chart.
 
@@ -17,10 +17,10 @@ input bool Info_On_Chart = true;          // Display info on chart.
 
 // Defines.
 #define ea_name "Strategy TMA_CG"
-#define ea_version "1.000"
+#define ea_version "1.005"
 #define ea_desc "Strategy based on EA31337 framework."
 #define ea_link "https://github.com/EA31337/Strategy-TMA_CG"
-#define ea_author "kenorb"
+#define ea_author "EA31337 Ltd"
 
 // Properties.
 #property version ea_version
@@ -29,6 +29,7 @@ input bool Info_On_Chart = true;          // Display info on chart.
 #property description ea_desc
 #endif
 #property link ea_link
+#property copyright "Copyright 2016-2021, EA31337 Ltd"
 
 // Class variables.
 EA *ea;
@@ -43,7 +44,7 @@ EA *ea;
 int OnInit() {
   bool _result = true;
   EAParams ea_params(__FILE__, Log_Level);
-  ea_params.SetChartInfoFreq(Info_On_Chart ? 2 : 0);
+  ea_params.Set(EA_PARAM_CHART_INFO_FREQ, Info_On_Chart ? 2 : 0);
   ea = new EA(ea_params);
   _result &= ea.StrategyAdd<Stg_TMA_CG>(Active_Tfs);
   return (_result ? INIT_SUCCEEDED : INIT_FAILED);
@@ -57,7 +58,7 @@ int OnInit() {
  */
 void OnTick() {
   ea.ProcessTick();
-  if (!ea.Terminal().IsOptimization()) {
+  if (!ea.GetTerminal().IsOptimization()) {
     ea.Log().Flush(2);
     ea.UpdateInfoOnChart();
   }
