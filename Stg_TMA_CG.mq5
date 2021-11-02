@@ -17,19 +17,30 @@ input bool Info_On_Chart = true;          // Display info on chart.
 
 // Defines.
 #define ea_name "Strategy TMA_CG"
-#define ea_version "1.000"
+#define ea_version "1.001"
 #define ea_desc "Strategy based on EA31337 framework."
 #define ea_link "https://github.com/EA31337/Strategy-TMA_CG"
-#define ea_author "EA31337 Ltd"
 
 // Properties.
-#property version ea_version
 #ifdef __MQL4__
 #property description ea_name
 #property description ea_desc
 #endif
 #property link ea_link
-#property copyright "Copyright 2016-2021, EA31337 Ltd"
+#property version ea_version
+#ifdef __resource__
+#ifdef __MQL5__
+#property tester_indicator "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP.ex5"
+#property tester_library "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP.ex5"
+#endif
+#endif
+
+// Load external resources.
+#ifdef __resource__
+#ifdef __MQL5__
+#resource INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP.ex5"
+#endif
+#endif
 
 // Class variables.
 EA *ea;

@@ -19,6 +19,9 @@
  *
  */
 
+// Defines
+#define INDI_TMA_CG_PATH "Indicators\\"
+
 // Indicator line identifiers used in the indicator.
 enum ENUM_TMA_CG_MODE {
   TMA_CG_TM_BUFF = 0,   // Temp buffer

@@ -5,18 +5,18 @@
 
 // User input params.
 INPUT string __TMA_CG_Parameters__ = "-- TMA CG strategy params --";  // >>> TMA CG <<<
-INPUT float TMA_CG_LotSize = 0;                                       // Lot size
-INPUT int TMA_CG_Shift = 0;                   // Shift (relative to the current bar, 0 - default)
-INPUT int TMA_CG_SignalOpenMethod = 0;        // Signal open method
-INPUT int TMA_CG_SignalOpenFilterMethod = 0;  // Signal open filter method
-INPUT float TMA_CG_SignalOpenLevel = 0;       // Signal open level
-INPUT int TMA_CG_SignalOpenBoostMethod = 0;   // Signal open boost method
-INPUT int TMA_CG_SignalCloseMethod = 0;       // Signal close method
-INPUT float TMA_CG_SignalCloseLevel = 0;      // Signal close level
-INPUT int TMA_CG_PriceStopMethod = 0;         // Price stop method
-INPUT float TMA_CG_PriceStopLevel = 2;        // Price stop level
-INPUT int TMA_CG_TickFilterMethod = 1;        // Tick filter method (0-255)
-INPUT float TMA_CG_MaxSpread = 2.0;           // Max spread to trade (in pips)
+INPUT int TMA_CG_SignalOpenMethod = 0;                                // Signal open method
+INPUT int TMA_CG_SignalOpenFilterMethod = 0;                          // Signal open filter method
+INPUT float TMA_CG_SignalOpenLevel = 0;                               // Signal open level
+INPUT int TMA_CG_SignalOpenBoostMethod = 0;                           // Signal open boost method
+INPUT int TMA_CG_SignalCloseMethod = 0;                               // Signal close method
+INPUT float TMA_CG_SignalCloseLevel = 0;                              // Signal close level
+INPUT int TMA_CG_PriceStopMethod = 0;                                 // Price stop method
+INPUT float TMA_CG_PriceStopLevel = 2;                                // Price stop level
+INPUT int TMA_CG_TickFilterMethod = 1;                                // Tick filter method (0-255)
+INPUT float TMA_CG_MaxSpread = 2.0;                                   // Max spread to trade (in pips)
+INPUT short TMA_CG_Shift = 0;           // Shift (relative to the current bar, 0 - default)
+INPUT int TMA_CG_OrderCloseTime = -20;  // Order close time in mins (>0) or bars (<0)
 INPUT string __TMA_CG_Indi_TMA_CG_Params__ =
     "-- TMA CG: TMA CG indicator params --";  // >>> TMA CG strategy: TMA CG indicator <<<
 INPUT bool TMA_CG_Indi_TMA_CG_CalculateTma = false;
@@ -32,6 +32,7 @@ INPUT bool TMA_CG_Indi_TMA_CG_Interpolate = true;
 INPUT bool TMA_CG_Indi_TMA_CG_AlertsOn = false;
 INPUT bool TMA_CG_Indi_TMA_CG_AlertsOnCurrent = false;
 INPUT bool TMA_CG_Indi_TMA_CG_AlertsOnHighLow = false;
+INPUT int TMA_CG_Indi_TMA_CG__Shift = 0;  // Shift (relative to the current bar, 0 - default)
 
 // Includes.
 #include "Indi_TMA_CG.mqh"
@@ -46,7 +47,7 @@ struct Indi_TMA_CG_Params_Defaults : Indi_TMA_CG_Params {
             ::TMA_CG_Indi_TMA_CG_AtrPeriod, ::TMA_CG_Indi_TMA_CG_BandsDeviations, ::TMA_CG_Indi_TMA_CG_MaAppliedPrice,
             ::TMA_CG_Indi_TMA_CG_MaMethod, ::TMA_CG_Indi_TMA_CG_MaPeriod, ::TMA_CG_Indi_TMA_CG_SignalDuration,
             ::TMA_CG_Indi_TMA_CG_Interpolate, ::TMA_CG_Indi_TMA_CG_AlertsOn, ::TMA_CG_Indi_TMA_CG_AlertsOnCurrent,
-            ::TMA_CG_Indi_TMA_CG_AlertsOnHighLow) {}
+            ::TMA_CG_Indi_TMA_CG_AlertsOnHighLow, ::TMA_CG_Indi_TMA_CG__Shift) {}
 } stg_tmacg_indi_tmacg_defaults;
 
 // Defines struct with default user strategy values.
@@ -55,7 +56,7 @@ struct Stg_TMA_CG_Params_Defaults : StgParams {
       : StgParams(::TMA_CG_SignalOpenMethod, ::TMA_CG_SignalOpenFilterMethod, ::TMA_CG_SignalOpenLevel,
                   ::TMA_CG_SignalOpenBoostMethod, ::TMA_CG_SignalCloseMethod, ::TMA_CG_SignalCloseLevel,
                   ::TMA_CG_PriceStopMethod, ::TMA_CG_PriceStopLevel, ::TMA_CG_TickFilterMethod, ::TMA_CG_MaxSpread,
-                  ::TMA_CG_Shift) {}
+                  ::TMA_CG_Shift, ::TMA_CG_OrderCloseTime) {}
 } stg_tmacg_defaults;
 
 // Defines struct to store indicator and strategy params.
