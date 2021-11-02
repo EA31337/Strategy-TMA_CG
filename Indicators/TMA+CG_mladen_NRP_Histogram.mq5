@@ -12,14 +12,14 @@
 #property indicator_maximum 1
 
 // Includes EA31337 framework.
-#include <EA31337-classes/Draw.mqh>
 #include <EA31337-classes/Indicator.mqh>
 #include <EA31337-classes/Indicators/Indi_ATR.mqh>
 #include <EA31337-classes/Indicators/Indi_MA.mqh>
 #include <EA31337-classes/Market.mqh>
 
 // Defines macros.
-#define Bars (Chart::iBars(_Symbol, _Period))
+#define extern input
+#define Bars (ChartStatic::iBars(_Symbol, _Period))
 
 // Custom indicator iteration function.
 /*
