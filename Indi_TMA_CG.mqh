@@ -31,48 +31,52 @@ enum ENUM_TMA_CG_MODE {
   FINAL_TMA_CG_MODE_ENTRY,
 };
 
-// Structs.
 // Defines struct to store indicator parameter values.
-struct Indi_TMA_CG_Params : public IndicatorParams {
-  // Constructors.
-  /*
-  void Indi_TMA_CG_Params(ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) {
-    SetDefaults();
-    SetDefaults(input_params);
-    SetTf(_tf);
-  }
-  */
-  /*
-  void Indi_TMA_CG_Params(IndiParamEntry &_params[]) {
-    SetDefaults();
-    SetDefaults(input_params);
-    SetInputParams(_params);
-  };
-  */
-  // Defaults.
-  void SetDefaults() {
+// Structs.
+struct Indi_TMA_CG_Params : IndicatorParams {
+  bool CalculateTma;
+  bool ReturnBars;
+  int HalfLength;
+  int AtrPeriod;
+  double BandsDeviations;
+  ENUM_APPLIED_PRICE MaAppliedPrice;
+  ENUM_MA_METHOD MaMethod;
+  int MaPeriod;
+  int SignalDuration;
+  bool Interpolate;
+  bool AlertsOn;
+  bool AlertsOnCurrent;
+  bool AlertsOnHighLow;
+  // Struct constructor.
+  void Indi_TMA_CG_Params(bool _CalculateTma = false, bool _ReturnBars = false, int _HalfLength = 61,
+                          int _AtrPeriod = 20, double _BandsDeviations = 2.8,
+                          ENUM_APPLIED_PRICE _MaAppliedPrice = PRICE_WEIGHTED, ENUM_MA_METHOD _MaMethod = MODE_SMA,
+                          int _MaPeriod = 1, int _SignalDuration = 3, bool _Interpolate = true, bool _AlertsOn = false,
+                          bool _AlertsOnCurrent = false, bool _AlertsOnHighLow = false, int _shift = 0)
+      : CalculateTma(_CalculateTma),
+        ReturnBars(_ReturnBars),
+        HalfLength(_HalfLength),
+        AtrPeriod(_AtrPeriod),
+        BandsDeviations(_BandsDeviations),
+        MaAppliedPrice(_MaAppliedPrice),
+        MaMethod(_MaMethod),
+        MaPeriod(_MaPeriod),
+        SignalDuration(_SignalDuration),
+        Interpolate(_Interpolate),
+        AlertsOn(_AlertsOn),
+        AlertsOnCurrent(_AlertsOnCurrent),
+        AlertsOnHighLow(_AlertsOnHighLow) {
+    itype = INDI_CUSTOM;
     max_modes = FINAL_TMA_CG_MODE_ENTRY;
-    custom_indi_name = "TMA+CG_mladen_NRP";
+    custom_indi_name = "Indi_TMA_CG";
     SetDataSourceType(IDATA_ICUSTOM);
-    SetDataValueRange(IDATA_RANGE_MIXED);
     SetDataValueType(TYPE_DOUBLE);
+    SetShift(_shift);
+  };
+  void Indi_TMA_CG_Params(Indi_TMA_CG_Params &_params, ENUM_TIMEFRAMES _tf) {
+    this = _params;
+    tf = _tf;
   }
-  /*
-  void SetDefaults(IndiParamEntry &_out[]) {
-    IndiParamEntry _defaults[10];
-    _defaults[0] = false;
-    _defaults[1] = false;
-    _defaults[2] = Indi_TMA_CG_HalfLength;
-    _defaults[3] = Indi_TMA_CG_AtrPeriod;
-    _defaults[4] = Indi_TMA_CG_BandsDeviations;
-    _defaults[5] = Indi_TMA_CG_MA_AppliedPrice;
-    _defaults[6] = Indi_TMA_CG_MM;
-    _defaults[7] = Indi_TMA_CG_Period;
-    _defaults[8] = Indi_TMA_CG_SignalDuration;
-    _defaults[9] = Indi_TMA_CG_Interpolate;
-    SetInputParams(_defaults);
-  }
-  */
 };
 
 /**
@@ -102,7 +106,7 @@ class Indi_TMA_CG : public Indicator {
     double _value = EMPTY_VALUE;
     switch (params.idstype) {
       case IDATA_ICUSTOM:
-        _value = iCustom(istate.handle, Get<string>(CHART_PARAM_SYMBOL), Get<ENUM_TIMEFRAMES>(CHART_PARAM_TF), params.custom_indi_name, params.tf,
+        _value = iCustom(istate.handle, GetSymbol(), GetTf(), params.custom_indi_name, params.tf,
                          params.input_params[0].integer_value, params.input_params[1].integer_value,
                          params.input_params[2].integer_value, params.input_params[3].integer_value,
                          params.input_params[4].double_value, params.input_params[5].integer_value,
@@ -132,6 +136,7 @@ class Indi_TMA_CG : public Indicator {
       for (ENUM_TMA_CG_MODE _mode = 0; _mode < FINAL_TMA_CG_MODE_ENTRY; _mode++) {
         _entry.values[_mode] = GetValue(_mode, _shift);
       }
+      //_entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, !_entry.HasValue<double>(DBL_MAX));
       _entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, _entry.IsGt<double>(0));
       if (_entry.IsValid()) {
         idata.Add(_entry, _bar_time);
