@@ -57,14 +57,6 @@ struct Stg_TMA_CG_Params_Defaults : StgParams {
                   ::TMA_CG_SignalOpenBoostMethod, ::TMA_CG_SignalCloseMethod, ::TMA_CG_SignalCloseLevel,
                   ::TMA_CG_PriceStopMethod, ::TMA_CG_PriceStopLevel, ::TMA_CG_TickFilterMethod, ::TMA_CG_MaxSpread,
                   ::TMA_CG_Shift, ::TMA_CG_OrderCloseTime) {}
-} stg_tmacg_defaults;
-
-// Defines struct to store indicator and strategy params.
-struct Stg_TMA_CG_Params {
-  StgParams sparams;
-
-  // Struct constructors.
-  Stg_TMA_CG_Params(StgParams &_sparams) : sparams(stg_tmacg_defaults) { sparams = _sparams; }
 };
 
 #ifdef __config__
@@ -85,6 +77,7 @@ class Stg_TMA_CG : public Strategy {
 
   static Stg_TMA_CG *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
+    Stg_TMA_CG_Params_Defaults stg_tmacg_defaults;
     Indi_TMA_CG_Params _indi_params(stg_tmacg_indi_tmacg_defaults, _tf);
     StgParams _stg_params(stg_tmacg_defaults);
 #ifdef __config__
