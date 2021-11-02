@@ -80,7 +80,8 @@ struct Stg_TMA_CG_Params {
 
 class Stg_TMA_CG : public Strategy {
  public:
-  Stg_TMA_CG(StgParams &_params, string _name) : Strategy(_params, _name) {}
+  Stg_TMA_CG(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
+      : Strategy(_sparams, _tparams, _cparams, _name) {}
 
   static Stg_TMA_CG *Init(ENUM_TIMEFRAMES _tf = NULL, long _magic_no = NULL, ENUM_LOG_LEVEL _log_level = V_INFO) {
     // Initialize strategy initial values.
@@ -94,13 +95,10 @@ class Stg_TMA_CG : public Strategy {
 #endif
     // Initialize indicator.
     _stg_params.SetIndicator(new Indi_TMA_CG(_indi_params));
-    // Initialize strategy parameters.
-    _stg_params.GetLog().SetLevel(_log_level);
-    _stg_params.SetMagicNo(_magic_no);
-    _stg_params.SetTf(_tf, _Symbol);
-    // Initialize strategy instance.
-    Strategy *_strat = new Stg_TMA_CG(_stg_params, "TMA CG");
-    _stg_params.SetStops(_strat, _strat);
+    // Initialize Strategy instance.
+    ChartParams _cparams(_tf, _Symbol);
+    TradeParams _tparams(_magic_no, _log_level);
+    Strategy *_strat = new Stg_TMA_CG(_stg_params, _tparams, _cparams, "TMA CG");
     return _strat;
   }
 
@@ -108,7 +106,7 @@ class Stg_TMA_CG : public Strategy {
    * Check strategy's opening signal.
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, float _level = 0.0f, int _shift = 0) {
-    Indicator *_indi = Data();
+    Indicator *_indi = GetIndicator();
     bool _is_valid = _indi[CURR].IsValid();
     bool _result = _is_valid;
     if (!_result) {
@@ -137,7 +135,7 @@ class Stg_TMA_CG : public Strategy {
    * Gets price stop value for profit take or stop loss.
    */
   float PriceStop(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0f) {
-    Indi_TMA_CG *_indi = Data();
+    Indi_TMA_CG *_indi = GetIndicator();
     double _trail = _level * Market().GetPipSize();
     // int _bar_count = (int)_level * 10;
     int _direction = Order::OrderDirection(_cmd, _mode);
