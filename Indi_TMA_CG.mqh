@@ -37,6 +37,7 @@ enum ENUM_TMA_CG_MODE {
 // Defines struct to store indicator parameter values.
 // Structs.
 struct Indi_TMA_CG_Params : IndicatorParams {
+ public:
   bool CalculateTma;
   bool ReturnBars;
   int HalfLength;
@@ -100,6 +101,18 @@ class Indi_TMA_CG : public Indicator {
    */
   // Indi_TMA_CG_Params GetIndiParams() const { return params; }
 
+  template <typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H, typename I,
+            typename J, typename K, typename L, typename M>
+  double iCustom(int &_handle, string _symbol, ENUM_TIMEFRAMES _tf, string _name, A _a, B _b, C _c, D _d, E _e, F _f,
+                 G _g, H _h, I _i, J _j, K _k, L _l, M _m, int _mode, int _shift) {
+#ifdef __MQL4__
+    return ::iCustom(_symbol, _tf, _name, _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _mode, _shift);
+#else  // __MQL5__
+    ICUSTOM_DEF(COMMA _a COMMA _b COMMA _c COMMA _d COMMA _e COMMA _f COMMA _g COMMA _h COMMA _i COMMA _j COMMA _k COMMA
+                    _l COMMA _m);
+#endif
+  }
+
   /**
    * Returns the indicator's value.
    *
@@ -109,12 +122,11 @@ class Indi_TMA_CG : public Indicator {
     double _value = EMPTY_VALUE;
     switch (params.idstype) {
       case IDATA_ICUSTOM:
-        _value = iCustom(istate.handle, GetSymbol(), GetTf(), params.custom_indi_name, params.tf,
-                         params.input_params[0].integer_value, params.input_params[1].integer_value,
-                         params.input_params[2].integer_value, params.input_params[3].integer_value,
-                         params.input_params[4].double_value, params.input_params[5].integer_value,
-                         params.input_params[6].integer_value, params.input_params[7].integer_value,
-                         params.input_params[8].integer_value, params.input_params[9].integer_value, _mode, _shift);
+        _value = iCustom(istate.handle, Get<string>(CHART_PARAM_SYMBOL), Get<ENUM_TIMEFRAMES>(CHART_PARAM_TF),
+                         params.custom_indi_name, params.CalculateTma, params.ReturnBars, params.HalfLength,
+                         params.AtrPeriod, params.BandsDeviations, params.MaAppliedPrice, params.MaMethod,
+                         params.MaPeriod, params.SignalDuration, params.Interpolate, params.AlertsOn,
+                         params.AlertsOnCurrent, params.AlertsOnHighLow, _mode, _shift);
         break;
       default:
         SetUserError(ERR_USER_NOT_SUPPORTED);
