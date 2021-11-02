@@ -72,7 +72,11 @@ struct Indi_TMA_CG_Params : IndicatorParams {
         AlertsOnHighLow(_AlertsOnHighLow) {
     itype = INDI_CUSTOM;
     max_modes = FINAL_TMA_CG_MODE_ENTRY;
-    custom_indi_name = "Indi_TMA_CG";
+#ifdef __resource__
+    custom_indi_name = "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP";
+#else
+    custom_indi_name = "TMA+CG_mladen_NRP";
+#endif
     SetDataSourceType(IDATA_ICUSTOM);
     SetDataValueType(TYPE_DOUBLE);
     SetShift(_shift);

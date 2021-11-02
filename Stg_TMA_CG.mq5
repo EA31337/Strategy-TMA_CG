@@ -17,7 +17,7 @@ input bool Info_On_Chart = true;          // Display info on chart.
 
 // Defines.
 #define ea_name "Strategy TMA_CG"
-#define ea_version "1.004"
+#define ea_version "1.005"
 #define ea_desc "Strategy based on EA31337 framework."
 #define ea_link "https://github.com/EA31337/Strategy-TMA_CG"
 
@@ -55,7 +55,6 @@ EA *ea;
 int OnInit() {
   bool _result = true;
   EAParams ea_params(__FILE__, Log_Level);
-  ea_params.Set(EA_PARAM_CHART_INFO_FREQ, Info_On_Chart ? 2 : 0);
   ea = new EA(ea_params);
   _result &= ea.StrategyAdd<Stg_TMA_CG>(Active_Tfs);
   return (_result ? INIT_SUCCEEDED : INIT_FAILED);
@@ -69,8 +68,7 @@ int OnInit() {
  */
 void OnTick() {
   ea.ProcessTick();
-  if (!ea.Terminal().IsOptimization()) {
-    ea.Log().Flush(2);
+  if (!ea.GetTerminal().IsOptimization()) {
     ea.UpdateInfoOnChart();
   }
 }
