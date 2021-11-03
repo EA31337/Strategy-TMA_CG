@@ -20,7 +20,7 @@
  */
 
 // Defines
-#define INDI_TMA_CG_PATH "Indicators\\"
+#define INDI_TMA_CG_PATH "indicators-other\\Misc"
 
 // Indicator line identifiers used in the indicator.
 enum ENUM_TMA_CG_MODE {
