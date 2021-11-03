@@ -69,19 +69,17 @@ struct Indi_TMA_CG_Params : IndicatorParams {
         Interpolate(_Interpolate),
         AlertsOn(_AlertsOn),
         AlertsOnCurrent(_AlertsOnCurrent),
-        AlertsOnHighLow(_AlertsOnHighLow) {
-    itype = INDI_CUSTOM;
-    max_modes = FINAL_TMA_CG_MODE_ENTRY;
+        AlertsOnHighLow(_AlertsOnHighLow),
+        IndicatorParams(INDI_CUSTOM, FINAL_TMA_CG_MODE_ENTRY, TYPE_DOUBLE) {
 #ifdef __resource__
     custom_indi_name = "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP";
 #else
     custom_indi_name = "TMA+CG_mladen_NRP";
 #endif
     SetDataSourceType(IDATA_ICUSTOM);
-    SetDataValueType(TYPE_DOUBLE);
     SetShift(_shift);
   };
-  void Indi_TMA_CG_Params(Indi_TMA_CG_Params &_params, ENUM_TIMEFRAMES _tf) {
+  Indi_TMA_CG_Params(Indi_TMA_CG_Params &_params, ENUM_TIMEFRAMES _tf) {
     this = _params;
     tf = _tf;
   }
@@ -90,7 +88,7 @@ struct Indi_TMA_CG_Params : IndicatorParams {
 /**
  * Implements indicator class.
  */
-class Indi_TMA_CG : public Indicator {
+class Indi_TMA_CG : public Indicator<Indi_TMA_CG_Params> {
  protected:
   Indi_TMA_CG_Params params;
 
@@ -98,7 +96,8 @@ class Indi_TMA_CG : public Indicator {
   /**
    * Class constructor.
    */
-  Indi_TMA_CG(Indi_TMA_CG_Params &_p) : Indicator((IndicatorParams)_p) { params = _p; }
+  Indi_TMA_CG(Indi_TMA_CG_Params &_p, IndicatorBase *_indi_src = NULL) : Indicator<Indi_TMA_CG_Params>(_p, _indi_src) {}
+  Indi_TMA_CG(ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) : Indicator(INDI_CUSTOM, _tf){};
 
   /**
    * Gets indicator's params.
@@ -122,7 +121,6 @@ class Indi_TMA_CG : public Indicator {
    *
    */
   double GetValue(ENUM_TMA_CG_MODE _mode, int _shift = 0) {
-    ResetLastError();
     double _value = EMPTY_VALUE;
     switch (params.idstype) {
       case IDATA_ICUSTOM:
@@ -135,32 +133,8 @@ class Indi_TMA_CG : public Indicator {
       default:
         SetUserError(ERR_USER_NOT_SUPPORTED);
         _value = EMPTY_VALUE;
+        break;
     }
-    istate.is_changed = false;
-    istate.is_ready = _LastError == ERR_NO_ERROR;
     return _value;
-  }
-
-  /**
-   * Returns the indicator's struct value.
-   */
-  IndicatorDataEntry GetEntry(int _shift = 0) {
-    long _bar_time = GetBarTime(_shift);
-    unsigned int _position;
-    IndicatorDataEntry _entry(params.max_modes);
-    if (idata.KeyExists(_bar_time, _position)) {
-      _entry = idata.GetByPos(_position);
-    } else {
-      _entry.timestamp = GetBarTime(_shift);
-      for (ENUM_TMA_CG_MODE _mode = 0; _mode < FINAL_TMA_CG_MODE_ENTRY; _mode++) {
-        _entry.values[_mode] = GetValue(_mode, _shift);
-      }
-      //_entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, !_entry.HasValue<double>(DBL_MAX));
-      _entry.SetFlag(INDI_ENTRY_FLAG_IS_VALID, _entry.IsGt<double>(0));
-      if (_entry.IsValid()) {
-        idata.Add(_entry, _bar_time);
-      }
-    }
-    return _entry;
   }
 };

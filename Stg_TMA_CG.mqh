@@ -96,11 +96,11 @@ class Stg_TMA_CG : public Strategy {
                              stg_tmacg_h4, stg_tmacg_h8);
 #endif
     // Initialize indicator.
-    _stg_params.SetIndicator(new Indi_TMA_CG(_indi_params));
     // Initialize Strategy instance.
     ChartParams _cparams(_tf, _Symbol);
     TradeParams _tparams;
     Strategy *_strat = new Stg_TMA_CG(_stg_params, _tparams, _cparams, "TMA CG");
+    _strat.SetIndicator(new Indi_TMA_CG(_indi_params));
     return _strat;
   }
 
@@ -108,8 +108,8 @@ class Stg_TMA_CG : public Strategy {
    * Check strategy's opening signal.
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, float _level = 0.0f, int _shift = 0) {
-    Indicator *_indi = GetIndicator();
-    bool _is_valid = _indi[CURR].IsValid();
+    Indi_TMA_CG *_indi = GetIndicator();
+    bool _is_valid = _indi[_shift].IsValid();
     bool _result = _is_valid;
     if (!_result) {
       // Returns false when indicator data is not valid.
@@ -118,50 +118,18 @@ class Stg_TMA_CG : public Strategy {
     double pip_level = _level * Chart().GetPipSize();
     switch (_cmd) {
       case ORDER_TYPE_BUY:
-        // _result = _indi[CURR][(int)TMA_CG_MAIN] < _indi[CURR][(int)TMA_CG_LOWER] + pip_level;
+        // _result = _indi[_shift][(int)TMA_CG_MAIN] < _indi[_shift][(int)TMA_CG_LOWER] + pip_level;
         if (_method != 0) {
-          // if (METHOD(_method, 0)) _result &= fmin(Close[PREV], Close[PPREV]) < _indi[CURR][(int)TMA_CG_LOWER];
+          // if (METHOD(_method, 0)) _result &= fmin(Close[PREV], Close[PPREV]) < _indi[_shift][(int)TMA_CG_LOWER];
         }
         break;
       case ORDER_TYPE_SELL:
-        // _result = _indi[CURR][(int)TMA_CG_MAIN] > _indi[CURR][(int)TMA_CG_UPPER] + pip_level;
+        // _result = _indi[_shift][(int)TMA_CG_MAIN] > _indi[_shift][(int)TMA_CG_UPPER] + pip_level;
         if (_method != 0) {
-          // if (METHOD(_method, 0)) _result &= fmin(Close[PREV], Close[PPREV]) > _indi[CURR][(int)TMA_CG_UPPER];
+          // if (METHOD(_method, 0)) _result &= fmin(Close[PREV], Close[PPREV]) > _indi[_shift][(int)TMA_CG_UPPER];
         }
         break;
     }
     return _result;
-  }
-
-  /**
-   * Gets price stop value for profit take or stop loss.
-   */
-  float PriceStop(ENUM_ORDER_TYPE _cmd, ENUM_ORDER_TYPE_VALUE _mode, int _method = 0, float _level = 0.0f) {
-    Indi_TMA_CG *_indi = GetIndicator();
-    double _trail = _level * Market().GetPipSize();
-    // int _bar_count = (int)_level * 10;
-    int _direction = Order::OrderDirection(_cmd, _mode);
-    double _default_value = Market().GetCloseOffer(_cmd) + _trail * _method * _direction;
-    double _result = _default_value;
-    switch (_method) {
-      case 1:
-        _result = (_direction > 0 ? _indi[CURR][(int)TMA_CG_UP_BUFF] : _indi[CURR][(int)TMA_CG_DN_BUFF]) +
-                  _trail * _direction;
-        break;
-      case 2:
-        _result = (_direction > 0 ? _indi[PREV][(int)TMA_CG_UP_BUFF] : _indi[PREV][(int)TMA_CG_DN_BUFF]) +
-                  _trail * _direction;
-        break;
-      case 3:
-        _result = (_direction > 0 ? _indi[PPREV][(int)TMA_CG_UP_BUFF] : _indi[PPREV][(int)TMA_CG_DN_BUFF]) +
-                  _trail * _direction;
-        break;
-      case 4:
-        _result = (_direction > 0 ? fmax(_indi[PREV][(int)TMA_CG_UP_BUFF], _indi[PPREV][(int)TMA_CG_UP_BUFF])
-                                  : fmin(_indi[PREV][(int)TMA_CG_DN_BUFF], _indi[PPREV][(int)TMA_CG_DN_BUFF])) +
-                  _trail * _direction;
-        break;
-    }
-    return (float)_result;
   }
 };
