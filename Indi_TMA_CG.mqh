@@ -20,17 +20,17 @@
  */
 
 // Defines
-#define INDI_TMA_CG_PATH "indicators-other\\Misc"
+#define INDI_TMA_CG_PATH "indicators-other\\PriceBands"
 
 // Indicator line identifiers used in the indicator.
 enum ENUM_TMA_CG_MODE {
-  TMA_CG_TM_BUFF = 0,   // Temp buffer
-  TMA_CG_UP_BUFF = 1,   // Upper buffer
-  TMA_CG_DN_BUFF = 2,   // Down buffer
-  TMA_CG_DN_ARROW = 3,  // Down arrow
-  TMA_CG_UP_ARROW = 4,  // Upper arrow
-  TMA_CG_WU_BUFF = 5,   // Down arrow
-  TMA_CG_WD_BUFF = 6,   // Upper arrow
+  TMA_CG_MN_BAND = 0,  // Middle band
+  TMA_CG_UP_BAND,      // Upper band
+  TMA_CG_LW_BAND,      // Lower band
+  TMA_CG_DN_ARROW,     // Down arrow
+  TMA_CG_UP_ARROW,     // Upper arrow
+  TMA_CG_WU_BUFF,      // TMA WU buffer
+  TMA_CG_WD_BUFF,      // TMA WD buffer
   FINAL_TMA_CG_MODE_ENTRY,
 };
 
@@ -101,9 +101,8 @@ class Indi_TMA_CG : public Indicator<Indi_TMA_CG_Params> {
 
   /**
    * Returns the indicator's value.
-   *
    */
-  double GetValue(ENUM_TMA_CG_MODE _mode, int _shift = 0) {
+  double GetValue(int _mode, int _shift = 0) {
     double _value = EMPTY_VALUE;
     switch (params.idstype) {
       case IDATA_ICUSTOM:
@@ -114,7 +113,7 @@ class Indi_TMA_CG : public Indicator<Indi_TMA_CG_Params> {
                          params.AlertsOnCurrent, params.AlertsOnHighLow, _mode, _shift);
         break;
       default:
-        SetUserError(ERR_USER_NOT_SUPPORTED);
+        SetUserError(ERR_INVALID_PARAMETER);
         _value = EMPTY_VALUE;
         break;
     }

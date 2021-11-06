@@ -109,27 +109,32 @@ class Stg_TMA_CG : public Strategy {
    */
   bool SignalOpen(ENUM_ORDER_TYPE _cmd, int _method = 0, float _level = 0.0f, int _shift = 0) {
     Indi_TMA_CG *_indi = GetIndicator();
-    bool _is_valid = _indi[_shift].IsValid();
-    bool _result = _is_valid;
+    int _ishift = _shift + ::TMA_CG_Indi_TMA_CG_Shift;
+    bool _result = _indi.GetFlag(INDI_ENTRY_FLAG_IS_VALID, _ishift);
     if (!_result) {
       // Returns false when indicator data is not valid.
       return false;
     }
-    double pip_level = _level * Chart().GetPipSize();
+    Chart *_chart = (Chart *)_indi;
     switch (_cmd) {
       case ORDER_TYPE_BUY:
-        // _result = _indi[_shift][(int)TMA_CG_MAIN] < _indi[_shift][(int)TMA_CG_LOWER] + pip_level;
-        if (_method != 0) {
-          // if (METHOD(_method, 0)) _result &= fmin(Close[PREV], Close[PPREV]) < _indi[_shift][(int)TMA_CG_LOWER];
-        }
+        _result &= _indi[_ishift][(int)TMA_CG_UP_ARROW] != 0;
         break;
       case ORDER_TYPE_SELL:
-        // _result = _indi[_shift][(int)TMA_CG_MAIN] > _indi[_shift][(int)TMA_CG_UPPER] + pip_level;
-        if (_method != 0) {
-          // if (METHOD(_method, 0)) _result &= fmin(Close[PREV], Close[PPREV]) > _indi[_shift][(int)TMA_CG_UPPER];
-        }
+        _result &= _indi[_ishift][(int)TMA_CG_DN_ARROW] != 0;
         break;
     }
+    return _result;
+  }
+
+  /**
+   * Checks if indicator entry values are valid.
+   */
+  virtual bool IsValidEntry(IndicatorDataEntry &_entry) {
+    bool _result = true;
+    _result &= _entry.values[(int)TMA_CG_MN_BAND] > 0;
+    _result &= _entry.values[(int)TMA_CG_UP_BAND] > 0;
+    _result &= _entry.values[(int)TMA_CG_LW_BAND] > 0;
     return _result;
   }
 };
