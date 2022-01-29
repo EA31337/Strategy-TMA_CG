@@ -102,8 +102,9 @@ class Indi_TMA_CG : public Indicator<Indi_TMA_CG_Params> {
   /**
    * Returns the indicator's value.
    */
-  double GetValue(int _mode, int _shift = 0) {
+  IndicatorDataEntryValue GetEntryValue(int _mode = 0, int _shift = -1) {
     double _value = EMPTY_VALUE;
+    int _ishift = _shift >= 0 ? _shift : iparams.GetShift();
     switch (params.idstype) {
       case IDATA_ICUSTOM:
         _value = iCustom(istate.handle, Get<string>(CHART_PARAM_SYMBOL), Get<ENUM_TIMEFRAMES>(CHART_PARAM_TF),
