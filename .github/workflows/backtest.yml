@@ -76,6 +76,20 @@ jobs:
           path: Include/EA31337-classes
           ref: v2.011
           repository: EA31337/EA31337-classes
+      - name: Enables input mode
+        run: echo '#define __input__' > config/define.h
+      - name: Enables resource mode
+        run: echo '#define __resource__' >> config/define.h
+      - uses: actions/checkout@v2
+        with:
+          path: indicators-other/Misc/Include/EA31337-classes
+          ref: v2.011
+          repository: EA31337/EA31337-classes
+      - uses: actions/checkout@v2
+        with:
+          path: indicators-other/PriceBands/Include/EA31337-classes
+          ref: v2.011
+          repository: EA31337/EA31337-classes
       - name: Compile strategy for MQL4
         uses: fx31337/mql-compile-action@master
         with:

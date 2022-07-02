@@ -3,12 +3,17 @@
  * Implements TMA CG strategy.
  */
 
+// Includes conditional compilation directives.
+#include "config/define.h"
+
 // Includes EA31337 framework.
 #include <EA31337-classes/EA.mqh>
+#include <EA31337-classes/Indicator.mqh>
 #include <EA31337-classes/Strategy.mqh>
 
 // Inputs.
-input int Active_Tfs = 19712;             // Timeframes (M1=1,M2=2,M5=16,M15=256,M30=1024,H1=2048,H2=4096,H3,H4,H6,H8)
+input int Active_Tfs = M15B + M30B + H1B + H2B + H3B + H4B + H6B +
+                       H8B;               // Timeframes (M1=1,M2=2,M5=16,M15=256,M30=1024,H1=2048,H2=4096,H3,H4,H6,H8)
 input ENUM_LOG_LEVEL Log_Level = V_INFO;  // Log level.
 input bool Info_On_Chart = true;          // Display info on chart.
 
@@ -20,6 +25,7 @@ input bool Info_On_Chart = true;          // Display info on chart.
 #define ea_version "1.010"
 #define ea_desc "Strategy based on EA31337 framework."
 #define ea_link "https://github.com/EA31337/Strategy-TMA_CG"
+#define ea_author "EA31337 Ltd"
 
 // Properties.
 #ifdef __MQL4__
