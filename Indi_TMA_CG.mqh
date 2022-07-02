@@ -69,14 +69,12 @@ struct Indi_TMA_CG_Params : IndicatorParams {
         Interpolate(_Interpolate),
         AlertsOn(_AlertsOn),
         AlertsOnCurrent(_AlertsOnCurrent),
-        AlertsOnHighLow(_AlertsOnHighLow),
-        IndicatorParams(INDI_CUSTOM, FINAL_TMA_CG_MODE_ENTRY, TYPE_DOUBLE) {
+        AlertsOnHighLow(_AlertsOnHighLow) {
 #ifdef __resource__
     custom_indi_name = "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP";
 #else
     custom_indi_name = "TMA+CG_mladen_NRP";
 #endif
-    SetDataSourceType(IDATA_ICUSTOM);
     SetShift(_shift);
   };
   Indi_TMA_CG_Params(Indi_TMA_CG_Params &_params, ENUM_TIMEFRAMES _tf) {
@@ -96,7 +94,12 @@ class Indi_TMA_CG : public Indicator<Indi_TMA_CG_Params> {
   /**
    * Class constructor.
    */
-  Indi_TMA_CG(Indi_TMA_CG_Params &_p, IndicatorBase *_indi_src = NULL) : Indicator<Indi_TMA_CG_Params>(_p, _indi_src) {}
+  Indi_TMA_CG(Indi_TMA_CG_Params &_p, ENUM_IDATA_SOURCE_TYPE _idstype = IDATA_ICUSTOM, IndicatorBase *_indi_src = NULL,
+              int _indi_src_mode = 0)
+      : Indicator<Indi_TMA_CG_Params>(_p,
+                                      IndicatorDataParams::GetInstance(FINAL_TMA_CG_MODE_ENTRY, TYPE_DOUBLE, _idstype,
+                                                                       IDATA_RANGE_PRICE, _indi_src_mode),
+                                      _indi_src) {}
   Indi_TMA_CG(ENUM_TIMEFRAMES _tf = PERIOD_CURRENT) : Indicator(INDI_CUSTOM, _tf){};
 
   /**
@@ -105,13 +108,13 @@ class Indi_TMA_CG : public Indicator<Indi_TMA_CG_Params> {
   IndicatorDataEntryValue GetEntryValue(int _mode = 0, int _shift = -1) {
     double _value = EMPTY_VALUE;
     int _ishift = _shift >= 0 ? _shift : iparams.GetShift();
-    switch (params.idstype) {
+    switch (Get<ENUM_IDATA_SOURCE_TYPE>(STRUCT_ENUM(IndicatorDataParams, IDATA_PARAM_IDSTYPE))) {
       case IDATA_ICUSTOM:
-        _value = iCustom(istate.handle, Get<string>(CHART_PARAM_SYMBOL), Get<ENUM_TIMEFRAMES>(CHART_PARAM_TF),
-                         params.custom_indi_name, params.CalculateTma, params.ReturnBars, params.HalfLength,
-                         params.AtrPeriod, params.BandsDeviations, params.MaAppliedPrice, params.MaMethod,
-                         params.MaPeriod, params.SignalDuration, params.Interpolate, params.AlertsOn,
-                         params.AlertsOnCurrent, params.AlertsOnHighLow, _mode, _shift);
+        _value =
+            iCustom(istate.handle, GetSymbol(), GetTf(), params.custom_indi_name, params.CalculateTma,
+                    params.ReturnBars, params.HalfLength, params.AtrPeriod, params.BandsDeviations,
+                    params.MaAppliedPrice, params.MaMethod, params.MaPeriod, params.SignalDuration, params.Interpolate,
+                    params.AlertsOn, params.AlertsOnCurrent, params.AlertsOnHighLow, _mode, _shift);
         break;
       default:
         SetUserError(ERR_INVALID_PARAMETER);

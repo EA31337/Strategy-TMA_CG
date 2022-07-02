@@ -27,14 +27,16 @@ jobs:
     strategy:
       matrix:
         file:
-          - TMA+CG_mladen_NRP
-          - TMA+CG_mladen_NRP_Histogram
+          - Misc/TMA+CG_mladen_NRP_Histogram
+          - PriceBands/TMA+CG_mladen_NRP
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
       - uses: actions/checkout@v2
         with:
           path: Include/EA31337-classes
-          ref: dev
+          ref: b26dfa50dbc3e7b9ae0b44df12c71650c1c47750
           repository: EA31337/EA31337-classes
       - name: Compile required indicator for MQL4
         uses: fx31337/mql-compile-action@master
@@ -42,7 +44,7 @@ jobs:
           include: .
           init-platform: true
           mt-version: 5.0.0.2361
-          path: Indicators/${{ matrix.file }}.mq4
+          path: indicators-other/${{ matrix.file }}.mq4
           verbose: true
       - name: Compile required indicator for MQL5
         uses: fx31337/mql-compile-action@master
@@ -50,7 +52,7 @@ jobs:
           include: .
           init-platform: true
           mt-version: 5.0.0.2515
-          path: Indicators/${{ matrix.file }}.mq5
+          path: indicators-other/${{ matrix.file }}.mq5
           verbose: true
       - name: List compiled files
         run: '(Get-ChildItem -Recurse -Path . -Include *.ex[45]).fullname'
@@ -67,13 +69,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
       - uses: actions/checkout@v2
         with:
           path: Include/EA31337-classes
-          ref: dev
+          ref: b26dfa50dbc3e7b9ae0b44df12c71650c1c47750
           repository: EA31337/EA31337-classes
-      - name: Enables optimization mode
-        run: echo '#define __input__' > config/define.h
       - name: Compile strategy for MQL4
         uses: fx31337/mql-compile-action@master
         with:
