@@ -30,10 +30,10 @@ jobs:
           - Misc/TMA+CG_mladen_NRP_Histogram
           - PriceBands/TMA+CG_mladen_NRP
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: Include/EA31337-classes
           ref: v2.011
@@ -68,10 +68,10 @@ jobs:
         shell: powershell
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'recursive'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           path: Include/EA31337-classes
           ref: v2.011
