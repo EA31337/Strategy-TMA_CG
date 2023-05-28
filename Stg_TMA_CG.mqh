@@ -84,7 +84,7 @@ class Stg_TMA_CG : public Strategy {
   Stg_TMA_CG(StgParams &_sparams, TradeParams &_tparams, ChartParams &_cparams, string _name = "")
       : Strategy(_sparams, _tparams, _cparams, _name) {}
 
-  static Stg_TMA_CG *Init(ENUM_TIMEFRAMES _tf = NULL) {
+  static Stg_TMA_CG *Init(ENUM_TIMEFRAMES _tf = NULL, EA* _ea = NULL) {
     // Initialize strategy initial values.
     Stg_TMA_CG_Params_Defaults stg_tmacg_defaults;
     Indi_TMA_CG_Params _indi_params(stg_tmacg_indi_tmacg_defaults, _tf);
