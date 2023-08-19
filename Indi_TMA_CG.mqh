@@ -20,7 +20,9 @@
  */
 
 // Defines
-#define INDI_TMA_CG_PATH "indicators-other\\PriceBands"
+#ifndef INDI_TMA_CG_PATH
+#define INDI_TMA_CG_PATH "indicators-other\\PriceBands\\TMA+CG_mladen_NRP"
+#endif
 
 // Indicator line identifiers used in the indicator.
 enum ENUM_TMA_CG_MODE {
@@ -72,7 +74,7 @@ struct Indi_TMA_CG_Params : IndicatorParams {
         AlertsOnHighLow(_AlertsOnHighLow),
         IndicatorParams(INDI_CUSTOM, FINAL_TMA_CG_MODE_ENTRY, TYPE_DOUBLE) {
 #ifdef __resource__
-    custom_indi_name = "::" + INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP";
+    custom_indi_name = "::" + INDI_TMA_CG_PATH;
 #else
     custom_indi_name = "TMA+CG_mladen_NRP";
 #endif
