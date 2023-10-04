@@ -38,7 +38,8 @@ input bool Info_On_Chart = true;          // Display info on chart.
 // Load external resources.
 #ifdef __resource__
 #ifdef __MQL5__
-#resource INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP.ex5"
+#resource INDI_TMA_CG_PATH + "\\TMA+CG_mladen_NRP" + MQL_EXT
+//#resource INDI_TDI_RT_PATH + "\\TDI-RT-Clone" + MQL_EXT
 #endif
 #endif
 
