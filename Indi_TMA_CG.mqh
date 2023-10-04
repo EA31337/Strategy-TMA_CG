@@ -21,7 +21,7 @@
 
 // Defines
 #ifndef INDI_TMA_CG_PATH
-#define INDI_TMA_CG_PATH "indicators-other\\PriceBands\\TMA+CG_mladen_NRP"
+#define INDI_TMA_CG_PATH "indicators-other\\PriceBands"
 #endif
 
 // Indicator line identifiers used in the indicator.
